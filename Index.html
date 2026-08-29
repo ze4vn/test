@@ -1,1 +1,123 @@
-<h1>Test</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External.net</title>
+</head>
+<body>
+    <div class="header">
+        <div class="left">External.net</div>
+        <div class="right">44devs</div>
+    </div>
+    <div class="line"></div>
+    <div class="scripts">Scripts</div>
+    <div class="app-box">
+        <div class="app-title">VizLock</div>
+        <button class="recive-btn" onclick="copyUrl()">Recive</button>
+    </div>
+
+    <div id="toast">
+        <div class="toast-title">Code Recived</div>
+        <div class="toast-desc">Paste The Copied RL In The Executor</div>
+    </div>
+</body>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-image: url('https://i.pinimg.com/1200x/f3/99/6d/f3996daed70c61a4cedcfaa30c49dc27.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        color: white;
+        font-family: sans-serif;
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 30px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .line {
+        height: 2px;
+        background-color: white;
+        width: 100%;
+    }
+    .scripts {
+        font-size: 28px;
+        padding: 30px;
+    }
+    .app-box {
+        display: inline-block;
+        border: 2px solid white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        text-align: center;
+        margin-left: 30px;
+        background-color: rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+    }
+    .app-box:hover {
+        transform: translateY(-5px);
+    }
+    .app-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    .recive-btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: white;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+    .recive-btn:hover {
+        background-color: gray;
+    }
+    #toast {
+        position: fixed;
+        top: 50%;
+        left: -400px;
+        transform: translateY(-50%);
+        background-color: rgba(20, 20, 30, 0.95);
+        color: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        border: 2px solid white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        transition: left 0.5s ease;
+        z-index: 1000;
+        min-width: 300px;
+    }
+    #toast.show {
+        left: 20px;
+    }
+    .toast-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .toast-desc {
+        font-size: 14px;
+    }
+</style>
+<script>
+    function copyUrl() {
+        navigator.clipboard.writeText('url1').then(function() {
+            var toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        });
+    }
+</script>
+</html>
