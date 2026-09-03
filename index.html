@@ -6,88 +6,92 @@
 </head>
 <body>
 
-    <div class="header">
-        <div class="left">External.net [v0.1.7]</div>
-        <div class="center">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search scripts...">
-        </div>
-        <div class="header-right">
-            <div class="rank-display" id="rankDisplay">Rank > None</div>
-            <div class="shop-btn" id="shopBtn">Shop</div>
-            <div class="right" id="vipBtn">Vip</div>
-        </div>
-    </div>
-
-    <div class="line"></div>
-
-    <div class="scripts">Scripts</div>
-
-    <div class="apps" id="appContainer">
-
-        <div class="app-box">
-            <div class="app-title">VizLock</div>
-            <button class="recive-btn" onclick="copyUrl('!Serv.Load = &quot;https://pastefy.app/RUi5Y136/raw&quot;')">
-                Recive
-            </button>
+    <div class="container">
+        <div class="header">
+            <div class="left">External.net [v0.1.8]</div>
+            <div class="center">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search scripts...">
+            </div>
+            <div class="header-right">
+                <div class="rank-display" id="rankDisplay">Rank > None</div>
+                <div class="shop-btn" id="shopBtn">Shop</div>
+                <div class="right" id="vipBtn">Vip</div>
+            </div>
         </div>
 
-        <div class="app-box">
-            <div class="app-title">Catowl Icon</div>
-            <button class="recive-btn" onclick="copyUrl('!Serv.Load = &quot;https://pastefy.app/6e0TjtO4/raw&quot;')">
-                Recive
-            </button>
+        <div class="line"></div>
+
+        <div class="scripts">Scripts</div>
+
+        <div class="apps" id="appContainer">
+            <div class="app-box">
+                <div class="app-title">VizLock</div>
+                <button class="recive-btn" onclick="copyUrl('!Serv.Load = &quot;https://pastefy.app/RUi5Y136/raw&quot;')">
+                    Recive
+                </button>
+            </div>
+            <div class="app-box">
+                <div class="app-title">Catowl Icon</div>
+                <button class="recive-btn" onclick="copyUrl('!Serv.Load = &quot;https://pastefy.app/6e0TjtO4/raw&quot;')">
+                    Recive
+                </button>
+            </div>
         </div>
 
-        <div class="app-box vip-gold" id="vipScriptBox" style="display: none;">
-            <div class="app-title">✦ Test Vip</div>
-            <button class="recive-btn" onclick="copyUrl(vipScript)">
-                Recive
-            </button>
+        <div class="section-line"></div>
+
+        <div class="scripts lua-header">
+            <span>LuaU Scripts / Roblox</span>
+            <div class="lua-tabs" id="luaTabs">
+                <button class="lua-tab active" data-tab="public">Public</button>
+                <button class="lua-tab" data-tab="vip" id="vipTab" style="display:none;">VIP</button>
+            </div>
         </div>
 
-    </div>
-
-    <div class="section-line"></div>
-
-    <div class="scripts">LuaU Scripts / Roblox</div>
-
-    <div class="apps">
-
-        <div class="app-box lua-box">
-            <div class="app-title">Better Leaderboard on F2</div>
-            <button class="recive-btn" onclick="copyUrl(leaderboardScript)">
-                Recive
-            </button>
+        <div class="apps lua-scripts" id="luaPublic">
+            <div class="app-box lua-box">
+                <div class="app-title">Better Leaderboard on F2</div>
+                <button class="recive-btn" onclick="copyUrl(leaderboardScript)">
+                    Recive
+                </button>
+            </div>
+            <div class="app-box lua-box">
+                <div class="app-title">Day to Night Loop</div>
+                <button class="recive-btn" onclick="copyUrl(dayNightLoop)">
+                    Recive
+                </button>
+            </div>
+            <div class="app-box lua-box">
+                <div class="app-title">Disco</div>
+                <button class="recive-btn" onclick="copyUrl(discoScript)">
+                    Recive
+                </button>
+            </div>
+            <div class="app-box lua-box">
+                <div class="app-title">Click Tp</div>
+                <button class="recive-btn" onclick="copyUrl(clickTpScript)">
+                    Recive
+                </button>
+            </div>
         </div>
 
-        <div class="app-box lua-box">
-            <div class="app-title">Day to Night Loop</div>
-            <button class="recive-btn" onclick="copyUrl(dayNightLoop)">
-                Recive
-            </button>
+        <div class="apps lua-scripts" id="luaVip" style="display:none;">
+            <div class="app-box lua-box vip-gold">
+                <div class="app-title">✦ Sential Godmode</div>
+                <button class="recive-btn" onclick="copyUrl(vipScript)">
+                    Recive
+                </button>
+            </div>
         </div>
+    </div> <!-- End of container -->
 
-        <div class="app-box lua-box">
-            <div class="app-title">Disco</div>
-            <button class="recive-btn" onclick="copyUrl(discoScript)">
-                Recive
-            </button>
-        </div>
-
-        <div class="app-box lua-box">
-            <div class="app-title">Click Tp</div>
-            <button class="recive-btn" onclick="copyUrl(clickTpScript)">
-                Recive
-            </button>
-        </div>
-
-    </div>
-
+    <!-- Toast Notification -->
     <div id="toast">
         <div class="toast-title">Code Recived</div>
         <div class="toast-desc">Paste The Copied RL In The Executor</div>
     </div>
 
+    <!-- VIP MODAL -->
     <div class="vip-overlay" id="vipOverlay">
         <div class="vip-modal" id="vipModal">
             <div class="vip-header">
@@ -115,6 +119,7 @@
         </div>
     </div>
 
+    <!-- SHOP MODAL -->
     <div class="shop-overlay" id="shopOverlay">
         <div class="shop-modal" id="shopModal">
             <div class="shop-header">
@@ -163,6 +168,27 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- DEVICE SELECTION MODAL (CUSTOM POPUP) -->
+    <div class="device-overlay" id="deviceOverlay">
+        <div class="device-modal" id="deviceModal">
+            <div class="device-header">
+                <span class="device-title">Info</span>
+            </div>
+            <div class="device-body">
+                <p class="device-desc">Recent Updates Have Been Going Fast, So Please Select Your Device To Have A Fixed View!</p>
+                <div class="device-actions">
+                    <button class="device-btn" data-device="Pc">Pc</button>
+                    <button class="device-btn" data-device="Mobile">Mobile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM BAR (clickable to change device) -->
+    <div class="bottom-bar" id="bottomBar">
+        Device: <span id="deviceName">Pc</span> <span style="opacity:0.5;font-size:11px;">(click to change)</span>
     </div>
 
     <script>
@@ -264,7 +290,6 @@ end)`;
         const enterBtn = document.getElementById('vipEnter');
         const inputField = document.getElementById('vipInput');
         const feedback = document.getElementById('vipFeedback');
-        const vipScriptBox = document.getElementById('vipScriptBox');
         const searchInput = document.getElementById('searchInput');
         const rankDisplay = document.getElementById('rankDisplay');
 
@@ -275,8 +300,60 @@ end)`;
         const shopTabs = document.querySelectorAll('.shop-tab');
         const tabContents = document.querySelectorAll('.shop-tab-content');
 
+        const luaTabs = document.querySelectorAll('.lua-tab');
+        const luaPublic = document.getElementById('luaPublic');
+        const luaVip = document.getElementById('luaVip');
+        const vipTabBtn = document.getElementById('vipTab');
+
+        // Device Selection Elements
+        const deviceOverlay = document.getElementById('deviceOverlay');
+        const deviceModal = document.getElementById('deviceModal');
+        const deviceBtns = document.querySelectorAll('.device-btn');
+        const bottomBar = document.getElementById('bottomBar');
+        const deviceNameSpan = document.getElementById('deviceName');
+
         let isOpen = false;
         let isShopOpen = false;
+
+        function showDeviceModal() {
+            deviceOverlay.style.display = 'flex';
+            requestAnimationFrame(() => {
+                deviceOverlay.classList.add('show');
+                deviceModal.classList.add('show');
+            });
+        }
+
+        function closeDeviceModal() {
+            deviceOverlay.classList.remove('show');
+            deviceModal.classList.remove('show');
+            setTimeout(() => {
+                deviceOverlay.style.display = 'none';
+            }, 350);
+        }
+
+        function setDevice(device) {
+            localStorage.setItem('device', device);
+            document.body.className = 'device-' + device.toLowerCase();
+            deviceNameSpan.textContent = device;
+            closeDeviceModal();
+        }
+
+        // Check for saved device preference
+        const savedDevice = localStorage.getItem('device');
+        if (!savedDevice) {
+            setTimeout(showDeviceModal, 300);
+        } else {
+            document.body.className = 'device-' + savedDevice.toLowerCase();
+            deviceNameSpan.textContent = savedDevice;
+        }
+
+        deviceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                setDevice(this.dataset.device);
+            });
+        });
+
+        bottomBar.addEventListener('click', showDeviceModal);
 
         function openVip() {
             if (isOpen) return;
@@ -332,6 +409,19 @@ end)`;
             });
         }
 
+        function switchLuaTab(tabId) {
+            luaTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabId);
+            });
+            if (tabId === 'public') {
+                luaPublic.style.display = 'flex';
+                luaVip.style.display = 'none';
+            } else {
+                luaPublic.style.display = 'none';
+                luaVip.style.display = 'flex';
+            }
+        }
+
         vipBtn.addEventListener('click', openVip);
         closeBtn.addEventListener('click', closeVip);
         overlay.addEventListener('click', function(e) {
@@ -349,6 +439,12 @@ end)`;
             });
         });
 
+        luaTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                switchLuaTab(this.dataset.tab);
+            });
+        });
+
         enterBtn.addEventListener('click', function() {
             const raw = inputField.value.trim();
             const username = raw.replace(/^@/, '').trim();
@@ -363,9 +459,10 @@ end)`;
             });
 
             if (found) {
-                vipScriptBox.style.display = 'inline-block';
                 rankDisplay.textContent = 'Rank > Diamond';
-                feedback.textContent = '✅ Access granted! VIP script unlocked.';
+                vipTabBtn.style.display = 'inline-block';
+                switchLuaTab('vip');
+                feedback.textContent = '✅ Access granted! VIP tab unlocked.';
                 feedback.className = 'vip-feedback success';
                 setTimeout(closeVip, 1200);
             } else {
@@ -385,6 +482,7 @@ end)`;
             if (e.key === 'Escape') {
                 if (isOpen) closeVip();
                 if (isShopOpen) closeShop();
+                if (deviceOverlay.style.display === 'flex') closeDeviceModal();
             }
         });
 
@@ -392,9 +490,6 @@ end)`;
             const query = searchInput.value.toLowerCase().trim();
             const appBoxes = document.querySelectorAll('.apps .app-box');
             appBoxes.forEach(function(box) {
-                if (box.id === 'vipScriptBox' && box.style.display === 'none') {
-                    return;
-                }
                 const title = box.querySelector('.app-title');
                 if (title) {
                     const text = title.textContent.toLowerCase();
@@ -789,6 +884,7 @@ end)`;
     </script>
 
     <style>
+        /* ─── BASE RESET & BODY ──────────────────────────────────── */
         body {
             margin: 0;
             padding: 0;
@@ -800,13 +896,32 @@ end)`;
             color: white;
             font-family: sans-serif;
             -webkit-tap-highlight-color: transparent;
+            padding-bottom: 50px;
         }
 
+        .container {
+            max-width: 100%;
+            padding: 0 10px;
+            transition: max-width 0.3s ease;
+        }
+
+        body.device-pc .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        body.device-mobile .container {
+            max-width: 100%;
+            padding: 0 10px;
+        }
+
+        /* ─── HEADER ─────────────────────────────────────────────── */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 16px;
+            padding: 16px 0;
             font-size: 20px;
             font-weight: bold;
             gap: 10px;
@@ -928,13 +1043,12 @@ end)`;
 
         .scripts {
             font-size: 24px;
-            padding: 22px 20px;
+            padding: 22px 0;
         }
 
         .apps {
             display: flex;
             gap: 14px;
-            margin-left: 20px;
             flex-wrap: wrap;
         }
 
@@ -985,6 +1099,47 @@ end)`;
 
         .recive-btn:active {
             transform: scale(0.94);
+        }
+
+        .lua-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .lua-tabs {
+            display: flex;
+            gap: 6px;
+        }
+
+        .lua-tab {
+            background: transparent;
+            border: 1px solid #666;
+            color: #aaa;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+            touch-action: manipulation;
+        }
+
+        .lua-tab:active {
+            transform: scale(0.95);
+        }
+
+        .lua-tab.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+        }
+
+        .lua-scripts {
+            margin-left: 0;
         }
 
         .vip-gold {
@@ -1038,7 +1193,8 @@ end)`;
         }
 
         .vip-overlay,
-        .shop-overlay {
+        .shop-overlay,
+        .device-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -1058,12 +1214,14 @@ end)`;
         }
 
         .vip-overlay.show,
-        .shop-overlay.show {
+        .shop-overlay.show,
+        .device-overlay.show {
             opacity: 1;
         }
 
         .vip-modal,
-        .shop-modal {
+        .shop-modal,
+        .device-modal {
             background: #1a1a1a;
             border: 1px solid #444;
             border-radius: 16px;
@@ -1080,13 +1238,15 @@ end)`;
         }
 
         .vip-modal.show,
-        .shop-modal.show {
+        .shop-modal.show,
+        .device-modal.show {
             transform: scale(1) translateY(0);
             opacity: 1;
         }
 
         .vip-header,
-        .shop-header {
+        .shop-header,
+        .device-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1094,7 +1254,8 @@ end)`;
         }
 
         .vip-title,
-        .shop-title {
+        .shop-title,
+        .device-title {
             font-size: 24px;
             font-weight: 800;
             letter-spacing: 0.3px;
@@ -1122,10 +1283,84 @@ end)`;
         }
 
         .vip-body,
-        .shop-body {
+        .shop-body,
+        .device-body {
             display: flex;
             flex-direction: column;
             gap: 14px;
+        }
+
+        .device-desc {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #ccc;
+            margin: 0;
+        }
+
+        .device-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .device-btn {
+            flex: 1;
+            background: transparent;
+            color: #fff;
+            border: 1px solid #666;
+            padding: 12px 0;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            touch-action: manipulation;
+            text-align: center;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .device-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #fff;
+        }
+
+        .device-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(20, 20, 30, 0.85);
+            border-top: 1px solid #444;
+            padding: 10px 0;
+            text-align: center;
+            color: #aaa;
+            cursor: pointer;
+            z-index: 999;
+            font-size: 14px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            transition: background 0.3s, color 0.3s;
+            user-select: none;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .bottom-bar:hover {
+            color: #fff;
+            background: rgba(30, 30, 40, 0.95);
+        }
+
+        .bottom-bar:active {
+            transform: scale(0.98);
         }
 
         .vip-desc {
@@ -1403,7 +1638,7 @@ end)`;
 
         @media (min-width: 600px) {
             .header {
-                padding: 20px 30px;
+                padding: 20px 0;
                 font-size: 24px;
                 flex-wrap: nowrap;
             }
@@ -1430,10 +1665,9 @@ end)`;
             }
             .scripts {
                 font-size: 28px;
-                padding: 30px;
+                padding: 30px 0;
             }
             .apps {
-                margin-left: 30px;
                 gap: 20px;
             }
             .app-box {
@@ -1452,15 +1686,18 @@ end)`;
                 min-height: 44px;
             }
             .vip-modal,
-            .shop-modal {
+            .shop-modal,
+            .device-modal {
                 padding: 32px 38px 38px 38px;
                 max-width: 520px;
             }
             .vip-title,
-            .shop-title {
+            .shop-title,
+            .device-title {
                 font-size: 28px;
             }
-            .vip-desc {
+            .vip-desc,
+            .device-desc {
                 font-size: 16px;
             }
             .vip-input {
@@ -1509,11 +1746,19 @@ end)`;
             .toast-desc {
                 font-size: 14px;
             }
+            .lua-tab {
+                font-size: 18px;
+                padding: 6px 20px;
+            }
+            .device-btn {
+                font-size: 18px;
+                min-height: 52px;
+            }
         }
 
         @media (max-width: 480px) {
             .header {
-                padding: 12px 10px;
+                padding: 12px 0;
                 gap: 6px;
                 font-size: 16px;
             }
@@ -1537,10 +1782,9 @@ end)`;
             }
             .scripts {
                 font-size: 20px;
-                padding: 16px 14px;
+                padding: 16px 0;
             }
             .apps {
-                margin-left: 12px;
                 gap: 10px;
             }
             .app-box {
@@ -1560,15 +1804,18 @@ end)`;
                 width: 100%;
             }
             .vip-modal,
-            .shop-modal {
+            .shop-modal,
+            .device-modal {
                 padding: 18px 14px 22px 14px;
                 border-radius: 14px;
             }
             .vip-title,
-            .shop-title {
+            .shop-title,
+            .device-title {
                 font-size: 20px;
             }
-            .vip-desc {
+            .vip-desc,
+            .device-desc {
                 font-size: 14px;
             }
             .vip-input {
@@ -1639,6 +1886,27 @@ end)`;
             .header-right {
                 gap: 4px;
             }
+            .lua-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+            .lua-tab {
+                font-size: 14px;
+                padding: 4px 12px;
+            }
+            .device-actions {
+                flex-direction: row;
+            }
+            .device-btn {
+                font-size: 14px;
+                min-height: 42px;
+                padding: 0 12px;
+            }
+            .bottom-bar {
+                font-size: 12px;
+                padding: 8px 0;
+            }
         }
 
         @media (max-width: 380px) {
@@ -1660,10 +1928,12 @@ end)`;
                 flex: 0 1 100%;
             }
             .vip-modal,
-            .shop-modal {
+            .shop-modal,
+            .device-modal {
                 padding: 14px 10px 18px 10px;
             }
         }
     </style>
+
 </body>
 </html>
