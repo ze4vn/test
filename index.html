@@ -8,7 +8,7 @@
 
     <div class="container">
         <div class="header">
-            <div class="left">External.net [v0.1.8]</div>
+            <div class="left">External.net [v0.1.9]</div>
             <div class="center">
                 <input type="text" id="searchInput" class="search-input" placeholder="Search scripts...">
             </div>
@@ -83,15 +83,13 @@
                 </button>
             </div>
         </div>
-    </div> <!-- End of container -->
+    </div>
 
-    <!-- Toast Notification -->
     <div id="toast">
         <div class="toast-title">Code Recived</div>
         <div class="toast-desc">Paste The Copied RL In The Executor</div>
     </div>
 
-    <!-- VIP MODAL -->
     <div class="vip-overlay" id="vipOverlay">
         <div class="vip-modal" id="vipModal">
             <div class="vip-header">
@@ -119,7 +117,6 @@
         </div>
     </div>
 
-    <!-- SHOP MODAL -->
     <div class="shop-overlay" id="shopOverlay">
         <div class="shop-modal" id="shopModal">
             <div class="shop-header">
@@ -170,7 +167,6 @@
         </div>
     </div>
 
-    <!-- DEVICE SELECTION MODAL (CUSTOM POPUP) -->
     <div class="device-overlay" id="deviceOverlay">
         <div class="device-modal" id="deviceModal">
             <div class="device-header">
@@ -186,7 +182,6 @@
         </div>
     </div>
 
-    <!-- BOTTOM BAR (clickable to change device) -->
     <div class="bottom-bar" id="bottomBar">
         Device: <span id="deviceName">Pc</span> <span style="opacity:0.5;font-size:11px;">(click to change)</span>
     </div>
@@ -305,7 +300,6 @@ end)`;
         const luaVip = document.getElementById('luaVip');
         const vipTabBtn = document.getElementById('vipTab');
 
-        // Device Selection Elements
         const deviceOverlay = document.getElementById('deviceOverlay');
         const deviceModal = document.getElementById('deviceModal');
         const deviceBtns = document.querySelectorAll('.device-btn');
@@ -338,7 +332,6 @@ end)`;
             closeDeviceModal();
         }
 
-        // Check for saved device preference
         const savedDevice = localStorage.getItem('device');
         if (!savedDevice) {
             setTimeout(showDeviceModal, 300);
@@ -414,11 +407,11 @@ end)`;
                 tab.classList.toggle('active', tab.dataset.tab === tabId);
             });
             if (tabId === 'public') {
-                luaPublic.style.display = 'flex';
+                luaPublic.style.display = 'grid';
                 luaVip.style.display = 'none';
             } else {
                 luaPublic.style.display = 'none';
-                luaVip.style.display = 'flex';
+                luaVip.style.display = 'grid';
             }
         }
 
@@ -494,7 +487,7 @@ end)`;
                 if (title) {
                     const text = title.textContent.toLowerCase();
                     if (text.includes(query)) {
-                        box.style.display = 'inline-block';
+                        box.style.display = 'flex';
                     } else {
                         box.style.display = 'none';
                     }
@@ -884,7 +877,6 @@ end)`;
     </script>
 
     <style>
-        /* ─── BASE RESET & BODY ──────────────────────────────────── */
         body {
             margin: 0;
             padding: 0;
@@ -916,7 +908,6 @@ end)`;
             padding: 0 10px;
         }
 
-        /* ─── HEADER ─────────────────────────────────────────────── */
         .header {
             display: flex;
             justify-content: space-between;
@@ -1047,22 +1038,24 @@ end)`;
         }
 
         .apps {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 14px;
-            flex-wrap: wrap;
         }
 
         .app-box {
-            display: inline-block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             border: 2px solid white;
-            padding: 16px 20px;
+            padding: 16px 12px;
             border-radius: 10px;
             text-align: center;
             background-color: rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease, opacity 0.3s ease;
-            min-width: 100px;
-            flex: 0 1 auto;
             touch-action: manipulation;
+            min-height: 120px;
         }
 
         .app-box:active {
@@ -1076,9 +1069,9 @@ end)`;
         .app-title {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 12px;
-            white-space: normal;
+            margin-bottom: 10px;
             word-break: break-word;
+            width: 100%;
         }
 
         .recive-btn {
@@ -1668,11 +1661,12 @@ end)`;
                 padding: 30px 0;
             }
             .apps {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
                 gap: 20px;
             }
             .app-box {
-                padding: 20px 30px;
-                min-width: 120px;
+                padding: 20px 24px;
+                min-height: 140px;
             }
             .app-title {
                 font-size: 22px;
@@ -1785,16 +1779,17 @@ end)`;
                 padding: 16px 0;
             }
             .apps {
+                grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
             .app-box {
-                padding: 12px 14px;
-                min-width: 70px;
-                flex: 0 1 calc(50% - 12px);
+                padding: 12px 10px;
+                min-height: 100px;
             }
             .app-title {
                 font-size: 15px;
                 margin-bottom: 8px;
+                white-space: normal;
             }
             .recive-btn {
                 font-size: 12px;
@@ -1924,8 +1919,13 @@ end)`;
                 padding: 2px 6px;
                 min-height: 22px;
             }
+            .apps {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
             .app-box {
-                flex: 0 1 100%;
+                padding: 10px 8px;
+                min-height: 90px;
             }
             .vip-modal,
             .shop-modal,
