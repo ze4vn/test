@@ -8,7 +8,7 @@
 
     <div class="container">
         <div class="header">
-            <div class="left">External.net [v0.1.9]</div>
+            <div class="left">External.net [v0.2.4]</div>
             <div class="center">
                 <input type="text" id="searchInput" class="search-input" placeholder="Search scripts...">
             </div>
@@ -129,25 +129,37 @@
                     <button class="shop-tab" data-tab="ranks">Ranks</button>
                 </div>
                 <div class="shop-tab-content active" id="tab-mystery">
-                    <div class="shop-item">
-                        <span class="shop-item-name">Mystery Box #1 [𝗟𝗶𝗺𝗶𝘁𝗲𝗱]</span>
+                    <div class="shop-item" data-date="2025-09-14T00:00:00" data-original-price="3">
+                        <div class="shop-item-header">
+                            <span class="shop-item-name">Mystery Box #1 [𝗟𝗶𝗺𝗶𝘁𝗲𝗱]</span>
+                            <span class="shop-item-release countdown">--</span>
+                        </div>
                         <div class="shop-item-actions">
+                            <span class="shop-item-price">3 R$</span>
+                            <button class="shop-stats-btn" data-box="0">Stats</button>
                             <a href="https://www.roblox.com/game-pass/1969230393/Mystery-Box-1" target="_blank" class="shop-purchase-btn">Purchase</a>
-                            <span class="shop-item-release">Realese: 14 sept</span>
                         </div>
                     </div>
-                    <div class="shop-item">
-                        <span class="shop-item-name">Mystery Box #2 [𝗟𝗶𝗺𝗶𝘁𝗲𝗱]</span>
+                    <div class="shop-item" data-date="2025-09-24T00:00:00" data-original-price="9">
+                        <div class="shop-item-header">
+                            <span class="shop-item-name">Mystery Box #2 [𝗟𝗶𝗺𝗶𝘁𝗲𝗱]</span>
+                            <span class="shop-item-release countdown">--</span>
+                        </div>
                         <div class="shop-item-actions">
+                            <span class="shop-item-price">9 R$</span>
+                            <button class="shop-stats-btn" data-box="1">Stats</button>
                             <a href="https://www.roblox.com/game-pass/1969164408/Mystery-Box-2" target="_blank" class="shop-purchase-btn">Purchase</a>
-                            <span class="shop-item-release">Realese: 24 sept</span>
                         </div>
                     </div>
-                    <div class="shop-item">
-                        <span class="shop-item-name">Mystery Box #3 [𝗟𝗶𝗺𝗶𝘁𝗲𝗱]</span>
+                    <div class="shop-item" data-date="2025-10-31T00:00:00" data-original-price="10">
+                        <div class="shop-item-header">
+                            <span class="shop-item-name">Mystery Box #3 [𝗟𝗶𝗺𝗶𝘁𝗲𝗱]</span>
+                            <span class="shop-item-release countdown">--</span>
+                        </div>
                         <div class="shop-item-actions">
+                            <span class="shop-item-price">10 R$</span>
+                            <button class="shop-stats-btn" data-box="2">Stats</button>
                             <a href="https://www.roblox.com/game-pass/1966304071/Mystery-Box-3" target="_blank" class="shop-purchase-btn">Purchase</a>
-                            <span class="shop-item-release">Realese: October 31st</span>
                         </div>
                     </div>
                 </div>
@@ -163,6 +175,27 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-overlay" id="statsOverlay">
+        <div class="stats-modal" id="statsModal">
+            <div class="stats-header">
+                <span class="stats-title" id="statsTitle">Stats</span>
+                <button class="stats-close" id="statsClose">✕</button>
+            </div>
+            <div class="stats-body">
+                <div class="stats-container">
+                    <div class="stats-info-box">
+                        <div class="stats-info-label">Value Change In The Next 24h</div>
+                        <div class="stats-info-price" id="statsCurrentPrice">0.00 R$</div>
+                    </div>
+                    <div class="stats-chart-wrapper">
+                        <canvas id="statsCanvas" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="stats-original-label">Original Price: <span id="statsOriginalPrice">0</span> R$ (yellow line)</div>
             </div>
         </div>
     </div>
@@ -306,8 +339,17 @@ end)`;
         const bottomBar = document.getElementById('bottomBar');
         const deviceNameSpan = document.getElementById('deviceName');
 
+        const statsOverlay = document.getElementById('statsOverlay');
+        const statsModal = document.getElementById('statsModal');
+        const statsClose = document.getElementById('statsClose');
+        const statsTitle = document.getElementById('statsTitle');
+        const statsCurrentPrice = document.getElementById('statsCurrentPrice');
+        const statsOriginalPrice = document.getElementById('statsOriginalPrice');
+        const statsCanvas = document.getElementById('statsCanvas');
+
         let isOpen = false;
         let isShopOpen = false;
+        let isStatsOpen = false;
 
         function showDeviceModal() {
             deviceOverlay.style.display = 'flex';
@@ -332,21 +374,106 @@ end)`;
             closeDeviceModal();
         }
 
-        const savedDevice = localStorage.getItem('device');
-        if (!savedDevice) {
-            setTimeout(showDeviceModal, 300);
-        } else {
-            document.body.className = 'device-' + savedDevice.toLowerCase();
-            deviceNameSpan.textContent = savedDevice;
+        function updateCountdowns() {
+            const items = document.querySelectorAll('.shop-item[data-date]');
+            const now = new Date();
+            items.forEach(item => {
+                const targetStr = item.dataset.date;
+                let target = new Date(targetStr);
+                if (target < now) {
+                    target.setFullYear(target.getFullYear() + 1);
+                }
+                const diff = target - now;
+                if (diff <= 0) {
+                    item.querySelector('.countdown').textContent = 'Released!';
+                    return;
+                }
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                item.querySelector('.countdown').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            });
         }
 
-        deviceBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                setDevice(this.dataset.device);
-            });
-        });
+        const boxPrices = [3, 9, 10];
 
-        bottomBar.addEventListener('click', showDeviceModal);
+        function openStats(boxIndex) {
+            if (isStatsOpen) return;
+            isStatsOpen = true;
+            const name = document.querySelectorAll('.shop-item-name')[boxIndex].textContent;
+            statsTitle.textContent = name + ' Stats';
+            const currentPrice = boxPrices[boxIndex];
+            statsCurrentPrice.textContent = currentPrice.toFixed(2) + ' R$';
+            statsOriginalPrice.textContent = currentPrice.toFixed(2);
+
+            statsOverlay.style.display = 'flex';
+            requestAnimationFrame(() => {
+                statsOverlay.classList.add('show');
+                statsModal.classList.add('show');
+            });
+
+            drawChart(boxIndex);
+        }
+
+        function closeStats() {
+            if (!isStatsOpen) return;
+            isStatsOpen = false;
+            statsOverlay.classList.remove('show');
+            statsModal.classList.remove('show');
+            setTimeout(() => {
+                statsOverlay.style.display = 'none';
+            }, 350);
+        }
+
+        function drawChart(boxIndex) {
+            const canvas = statsCanvas;
+            const ctx = canvas.getContext('2d');
+            const originalPrice = boxPrices[boxIndex];
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = { top: 20, bottom: 30, left: 40, right: 20 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+
+            const minPrice = 0;
+            const maxPrice = originalPrice * 2.5;
+            const priceRange = maxPrice - minPrice;
+
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.font = '11px sans-serif';
+            ctx.fillStyle = '#aaa';
+            ctx.textAlign = 'right';
+            const steps = 5;
+            for (let i = 0; i <= steps; i++) {
+                const y = padding.top + chartHeight - (i / steps) * chartHeight;
+                const price = minPrice + (i / steps) * priceRange;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.stroke();
+                ctx.fillStyle = '#888';
+                ctx.textAlign = 'right';
+                ctx.fillText(price.toFixed(2), padding.left - 5, y + 4);
+            }
+
+            const originalY = padding.top + chartHeight - ((originalPrice - minPrice) / priceRange) * chartHeight;
+            ctx.beginPath();
+            ctx.setLineDash([6, 4]);
+            ctx.moveTo(padding.left, originalY);
+            ctx.lineTo(width - padding.right, originalY);
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#FFD700';
+            ctx.textAlign = 'left';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Original Price: ' + originalPrice.toFixed(2) + ' R$', padding.left + 10, originalY - 10);
+        }
 
         function openVip() {
             if (isOpen) return;
@@ -438,6 +565,18 @@ end)`;
             });
         });
 
+        statsClose.addEventListener('click', closeStats);
+        statsOverlay.addEventListener('click', function(e) {
+            if (e.target === statsOverlay) closeStats();
+        });
+
+        document.querySelectorAll('.shop-stats-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const boxIndex = parseInt(this.dataset.box);
+                openStats(boxIndex);
+            });
+        });
+
         enterBtn.addEventListener('click', function() {
             const raw = inputField.value.trim();
             const username = raw.replace(/^@/, '').trim();
@@ -475,6 +614,7 @@ end)`;
             if (e.key === 'Escape') {
                 if (isOpen) closeVip();
                 if (isShopOpen) closeShop();
+                if (isStatsOpen) closeStats();
                 if (deviceOverlay.style.display === 'flex') closeDeviceModal();
             }
         });
@@ -874,6 +1014,25 @@ end)`;
         refresh()`;
 
         window.copyUrl = copyUrl;
+
+        const savedDevice = localStorage.getItem('device');
+        if (savedDevice) {
+            document.body.className = 'device-' + savedDevice.toLowerCase();
+            deviceNameSpan.textContent = savedDevice;
+        }
+
+        showDeviceModal();
+
+        deviceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                setDevice(this.dataset.device);
+            });
+        });
+
+        bottomBar.addEventListener('click', showDeviceModal);
+
+        updateCountdowns();
+        setInterval(updateCountdowns, 1000);
     </script>
 
     <style>
@@ -1187,6 +1346,7 @@ end)`;
 
         .vip-overlay,
         .shop-overlay,
+        .stats-overlay,
         .device-overlay {
             position: fixed;
             top: 0;
@@ -1208,18 +1368,20 @@ end)`;
 
         .vip-overlay.show,
         .shop-overlay.show,
+        .stats-overlay.show,
         .device-overlay.show {
             opacity: 1;
         }
 
         .vip-modal,
         .shop-modal,
+        .stats-modal,
         .device-modal {
             background: #1a1a1a;
             border: 1px solid #444;
             border-radius: 16px;
             padding: 24px 20px 28px 20px;
-            max-width: 480px;
+            max-width: 520px;
             width: 100%;
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
             transform: scale(0.88) translateY(20px);
@@ -1232,6 +1394,7 @@ end)`;
 
         .vip-modal.show,
         .shop-modal.show,
+        .stats-modal.show,
         .device-modal.show {
             transform: scale(1) translateY(0);
             opacity: 1;
@@ -1239,6 +1402,7 @@ end)`;
 
         .vip-header,
         .shop-header,
+        .stats-header,
         .device-header {
             display: flex;
             justify-content: space-between;
@@ -1248,6 +1412,7 @@ end)`;
 
         .vip-title,
         .shop-title,
+        .stats-title,
         .device-title {
             font-size: 24px;
             font-weight: 800;
@@ -1256,7 +1421,8 @@ end)`;
         }
 
         .vip-close,
-        .shop-close {
+        .shop-close,
+        .stats-close {
             background: rgba(255, 255, 255, 0.06);
             border: none;
             color: #aaa;
@@ -1271,12 +1437,14 @@ end)`;
         }
 
         .vip-close:active,
-        .shop-close:active {
+        .shop-close:active,
+        .stats-close:active {
             transform: scale(0.9);
         }
 
         .vip-body,
         .shop-body,
+        .stats-body,
         .device-body {
             display: flex;
             flex-direction: column;
@@ -1528,11 +1696,17 @@ end)`;
 
         .shop-item {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
             padding: 10px 0;
             border-bottom: 1px solid #333;
+            gap: 6px;
+        }
+
+        .shop-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
             gap: 8px;
         }
 
@@ -1540,8 +1714,19 @@ end)`;
             font-size: 15px;
             font-weight: 600;
             color: #eee;
-            flex: 1 1 140px;
-            word-break: break-word;
+        }
+
+        .shop-item-release {
+            font-size: 13px;
+            color: #888;
+            font-weight: 300;
+            white-space: nowrap;
+        }
+
+        .countdown {
+            font-family: monospace;
+            font-weight: 600;
+            color: #fff;
         }
 
         .shop-item-actions {
@@ -1549,6 +1734,37 @@ end)`;
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
+            margin-top: 2px;
+        }
+
+        .shop-item-price {
+            font-size: 15px;
+            color: #4CAF50;
+            font-weight: 700;
+        }
+
+        .shop-stats-btn {
+            background: transparent;
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            touch-action: manipulation;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shop-stats-btn:hover {
+            background: rgba(76, 175, 80, 0.15);
+        }
+        .shop-stats-btn:active {
+            transform: scale(0.95);
         }
 
         .shop-purchase-btn {
@@ -1557,7 +1773,7 @@ end)`;
             text-decoration: none;
             font-weight: 700;
             font-size: 13px;
-            padding: 5px 16px;
+            padding: 4px 16px;
             border-radius: 20px;
             transition: all 0.25s;
             border: none;
@@ -1566,19 +1782,12 @@ end)`;
             align-items: center;
             justify-content: center;
             touch-action: manipulation;
-            min-height: 36px;
+            min-height: 32px;
         }
 
         .shop-purchase-btn:active {
             transform: scale(0.95);
             background: #ddd;
-        }
-
-        .shop-item-release {
-            font-size: 13px;
-            color: #888;
-            font-weight: 300;
-            white-space: nowrap;
         }
 
         .tooltip-container {
@@ -1627,6 +1836,60 @@ end)`;
             border-width: 5px;
             border-style: solid;
             border-color: #333 transparent transparent transparent;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+            min-height: 200px;
+        }
+
+        .stats-info-box {
+            flex: 0 0 40%;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stats-info-label {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .stats-info-price {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stats-chart-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #statsCanvas {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 2 / 1;
+            background: #0a0a0a;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .stats-original-label {
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+            margin-top: 10px;
         }
 
         @media (min-width: 600px) {
@@ -1681,12 +1944,14 @@ end)`;
             }
             .vip-modal,
             .shop-modal,
+            .stats-modal,
             .device-modal {
                 padding: 32px 38px 38px 38px;
-                max-width: 520px;
+                max-width: 560px;
             }
             .vip-title,
             .shop-title,
+            .stats-title,
             .device-title {
                 font-size: 28px;
             }
@@ -1711,7 +1976,6 @@ end)`;
             }
             .shop-item-name {
                 font-size: 17px;
-                flex: 1 1 200px;
             }
             .shop-purchase-btn {
                 font-size: 14px;
@@ -1747,6 +2011,23 @@ end)`;
             .device-btn {
                 font-size: 18px;
                 min-height: 52px;
+            }
+            .countdown {
+                font-size: 14px;
+            }
+            .shop-item-price {
+                font-size: 17px;
+            }
+            .shop-stats-btn {
+                font-size: 13px;
+                padding: 4px 16px;
+                min-height: 36px;
+            }
+            .stats-info-price {
+                font-size: 36px;
+            }
+            #statsCanvas {
+                min-height: 220px;
             }
         }
 
@@ -1800,12 +2081,15 @@ end)`;
             }
             .vip-modal,
             .shop-modal,
+            .stats-modal,
             .device-modal {
                 padding: 18px 14px 22px 14px;
                 border-radius: 14px;
+                max-width: 98%;
             }
             .vip-title,
             .shop-title,
+            .stats-title,
             .device-title {
                 font-size: 20px;
             }
@@ -1830,17 +2114,13 @@ end)`;
                 min-height: 42px;
             }
             .shop-item {
-                flex-direction: column;
-                align-items: flex-start;
                 padding: 8px 0;
             }
             .shop-item-actions {
-                width: 100%;
-                justify-content: flex-start;
+                gap: 8px;
             }
             .shop-item-name {
                 font-size: 14px;
-                flex: 1 1 auto;
             }
             .shop-purchase-btn {
                 font-size: 12px;
@@ -1902,6 +2182,31 @@ end)`;
                 font-size: 12px;
                 padding: 8px 0;
             }
+            .countdown {
+                font-size: 12px;
+            }
+            .shop-item-price {
+                font-size: 14px;
+            }
+            .shop-stats-btn {
+                font-size: 11px;
+                padding: 3px 10px;
+                min-height: 28px;
+            }
+            .stats-container {
+                flex-direction: column;
+            }
+            .stats-info-box {
+                flex: 1 1 auto;
+                padding: 15px;
+                min-height: 80px;
+            }
+            .stats-info-price {
+                font-size: 24px;
+            }
+            #statsCanvas {
+                min-height: 150px;
+            }
         }
 
         @media (max-width: 380px) {
@@ -1929,8 +2234,12 @@ end)`;
             }
             .vip-modal,
             .shop-modal,
+            .stats-modal,
             .device-modal {
                 padding: 14px 10px 18px 10px;
+            }
+            .stats-info-price {
+                font-size: 20px;
             }
         }
     </style>
