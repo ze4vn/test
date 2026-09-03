@@ -7,7 +7,7 @@
 <body>
 
     <div class="header">
-        <div class="left">External.net [v0.1.6]</div>
+        <div class="left">External.net [v0.1.7]</div>
         <div class="center">
             <input type="text" id="searchInput" class="search-input" placeholder="Search scripts...">
         </div>
@@ -70,6 +70,13 @@
         <div class="app-box lua-box">
             <div class="app-title">Disco</div>
             <button class="recive-btn" onclick="copyUrl(discoScript)">
+                Recive
+            </button>
+        </div>
+
+        <div class="app-box lua-box">
+            <div class="app-title">Click Tp</div>
+            <button class="recive-btn" onclick="copyUrl(clickTpScript)">
                 Recive
             </button>
         </div>
@@ -167,7 +174,77 @@
             config: "type:button; duration:0.5s; easing:cubic-bezier(0.4,0,0.2,1);"
         };
 
-        const vipScript = "Soon!";
+        const vipScript = `local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+
+local deathPosition = nil
+
+local function setupCharacter(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    if deathPosition then
+        task.wait(0.1)
+        rootPart.CFrame = CFrame.new(deathPosition)
+        deathPosition = nil
+    end
+
+    humanoid.Died:Connect(function()
+        deathPosition = rootPart.Position
+        print("Death position:", deathPosition)
+    end)
+end
+
+if player.Character then
+    setupCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(setupCharacter)`;
+
+        const clickTpScript = `local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local ctrlHeld = false
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode.LeftControl
+        or input.KeyCode == Enum.KeyCode.RightControl then
+
+        ctrlHeld = true
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.LeftControl
+        or input.KeyCode == Enum.KeyCode.RightControl then
+
+        ctrlHeld = false
+    end
+end)
+
+mouse.Button1Down:Connect(function()
+    if not ctrlHeld then
+        return
+    end
+
+    local character = player.Character
+    if not character then
+        return
+    end
+
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        return
+    end
+
+    local targetPosition = mouse.Hit.Position
+
+    humanoidRootPart.CFrame = CFrame.new(targetPosition + Vector3.new(0, 3, 0))
+end)`;
 
         function getAllowedUsers() {
             const raw = Button_Animation.userData || "";
@@ -276,7 +353,7 @@
             const raw = inputField.value.trim();
             const username = raw.replace(/^@/, '').trim();
             if (!username) {
-                feedback.textContent = ' Please enter a username.';
+                feedback.textContent = '⚠️ Please enter a username.';
                 feedback.className = 'vip-feedback error';
                 return;
             }
@@ -288,11 +365,11 @@
             if (found) {
                 vipScriptBox.style.display = 'inline-block';
                 rankDisplay.textContent = 'Rank > Diamond';
-                feedback.textContent = 'VIP Unlocked!';
+                feedback.textContent = '✅ Access granted! VIP script unlocked.';
                 feedback.className = 'vip-feedback success';
                 setTimeout(closeVip, 1200);
             } else {
-                feedback.textContent = 'Denied. You need to own the Diamond Rank.';
+                feedback.textContent = '❌ Access denied. You need to own the Diamond Rank gamepass.';
                 feedback.className = 'vip-feedback error';
             }
         });
