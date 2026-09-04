@@ -8,7 +8,7 @@
 
     <div class="container">
         <div class="header">
-            <div class="left">External.net [v0.2.5]</div>
+            <div class="left">External.net [v0.2.6]</div>
             <div class="center">
                 <input type="text" id="searchInput" class="search-input" placeholder="Search scripts...">
             </div>
@@ -129,13 +129,13 @@
                     <button class="shop-tab" data-tab="ranks">Ranks</button>
                 </div>
                 <div class="shop-tab-content active" id="tab-mystery">
-                    <div class="shop-item" data-date="2025-09-14T00:00:00" data-original-price="5">
+                    <div class="shop-item" data-date="2025-09-14T00:00:00" data-original-price="3">
                         <div class="shop-item-header">
                             <span class="shop-item-name">Mystery Box #1 [𝗟𝗶𝗺𝗶𝘁𝗲𝗱]</span>
                             <span class="shop-item-release countdown">--</span>
                         </div>
                         <div class="shop-item-actions">
-                            <span class="shop-item-price">3 R$</span>
+                            <span class="shop-item-price">5 R$</span>
                             <button class="shop-stats-btn" data-box="0">Stats</button>
                             <a href="https://www.roblox.com/game-pass/1969230393/Mystery-Box-1" target="_blank" class="shop-purchase-btn">Purchase</a>
                         </div>
@@ -186,15 +186,10 @@
                 <button class="stats-close" id="statsClose">✕</button>
             </div>
             <div class="stats-body">
-                <div class="stats-container">
-                    <div class="stats-info-box">
-                        <div class="stats-info-label">Value Change In The Next 24h</div>
-                        <div class="stats-info-price" id="statsCurrentPrice">0.00 R$</div>
-                    </div>
-                    <div class="stats-chart-wrapper">
-                        <canvas id="statsCanvas" width="400" height="200"></canvas>
-                    </div>
+                <div class="stats-chart-wrapper">
+                    <canvas id="statsCanvas" width="400" height="200"></canvas>
                 </div>
+                <div class="stats-info-text" id="statsInfoText"></div>
                 <div class="stats-original-label">Original Price: <span id="statsOriginalPrice">0</span> R$ (yellow line)</div>
             </div>
         </div>
@@ -343,9 +338,9 @@ end)`;
         const statsModal = document.getElementById('statsModal');
         const statsClose = document.getElementById('statsClose');
         const statsTitle = document.getElementById('statsTitle');
-        const statsCurrentPrice = document.getElementById('statsCurrentPrice');
-        const statsOriginalPrice = document.getElementById('statsOriginalPrice');
         const statsCanvas = document.getElementById('statsCanvas');
+        const statsOriginalPrice = document.getElementById('statsOriginalPrice');
+        const statsInfoText = document.getElementById('statsInfoText');
 
         let isOpen = false;
         let isShopOpen = false;
@@ -403,9 +398,14 @@ end)`;
             isStatsOpen = true;
             const name = document.querySelectorAll('.shop-item-name')[boxIndex].textContent;
             statsTitle.textContent = name + ' Stats';
-            const currentPrice = boxPrices[boxIndex];
-            statsCurrentPrice.textContent = currentPrice.toFixed(2) + ' R$';
-            statsOriginalPrice.textContent = currentPrice.toFixed(2);
+            const originalPrice = boxPrices[boxIndex];
+            statsOriginalPrice.textContent = originalPrice.toFixed(2);
+
+            if (boxIndex === 0) {
+                statsInfoText.textContent = 'Price went up from 3 R$ to 5 R$ (+~67%)';
+            } else {
+                statsInfoText.textContent = 'Current Price: ' + originalPrice.toFixed(2) + ' R$';
+            }
 
             statsOverlay.style.display = 'flex';
             requestAnimationFrame(() => {
@@ -438,7 +438,7 @@ end)`;
             const chartHeight = height - padding.top - padding.bottom;
 
             const minPrice = 0;
-            const maxPrice = originalPrice * 2.5;
+            const maxPrice = boxIndex === 0 ? 6 : originalPrice * 2.5;
             const priceRange = maxPrice - minPrice;
 
             ctx.clearRect(0, 0, width, height);
@@ -460,6 +460,7 @@ end)`;
                 ctx.fillText(price.toFixed(2), padding.left - 5, y + 4);
             }
 
+            // Draw yellow line for original price
             const originalY = padding.top + chartHeight - ((originalPrice - minPrice) / priceRange) * chartHeight;
             ctx.beginPath();
             ctx.setLineDash([6, 4]);
@@ -473,6 +474,45 @@ end)`;
             ctx.textAlign = 'left';
             ctx.font = '12px sans-serif';
             ctx.fillText('Original Price: ' + originalPrice.toFixed(2) + ' R$', padding.left + 10, originalY - 10);
+
+            // Draw green candle for box 0
+            if (boxIndex === 0) {
+                const candleX = padding.left + chartWidth * 0.2;
+                const open = 3;
+                const close = 5;
+                const high = 5;
+                const low = 3;
+
+                const openY = padding.top + chartHeight - ((open - minPrice) / priceRange) * chartHeight;
+                const closeY = padding.top + chartHeight - ((close - minPrice) / priceRange) * chartHeight;
+                const highY = padding.top + chartHeight - ((high - minPrice) / priceRange) * chartHeight;
+                const lowY = padding.top + chartHeight - ((low - minPrice) / priceRange) * chartHeight;
+
+                const isGreen = close >= open;
+                ctx.fillStyle = isGreen ? '#4CAF50' : '#f44336';
+                ctx.strokeStyle = isGreen ? '#4CAF50' : '#f44336';
+                ctx.lineWidth = 1.5;
+
+                // Wick
+                ctx.beginPath();
+                ctx.moveTo(candleX, highY);
+                ctx.lineTo(candleX, lowY);
+                ctx.stroke();
+
+                // Candle body
+                const bodyTop = Math.min(openY, closeY);
+                const bodyBottom = Math.max(openY, closeY);
+                const bodyHeight = Math.max(bodyBottom - bodyTop, 2);
+                const candleWidth = 14;
+                ctx.fillRect(candleX - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
+                ctx.strokeRect(candleX - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
+
+                // Label the candle
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.font = '11px sans-serif';
+                ctx.fillText('+67%', candleX, bodyTop - 8);
+            }
         }
 
         function openVip() {
@@ -581,7 +621,7 @@ end)`;
             const raw = inputField.value.trim();
             const username = raw.replace(/^@/, '').trim();
             if (!username) {
-                feedback.textContent = '⚠️ Please enter a username.';
+                feedback.textContent = 'Please enter a username.';
                 feedback.className = 'vip-feedback error';
                 return;
             }
@@ -594,11 +634,11 @@ end)`;
                 rankDisplay.textContent = 'Rank > Diamond';
                 vipTabBtn.style.display = 'inline-block';
                 switchLuaTab('vip');
-                feedback.textContent = '✅ Access granted! VIP tab unlocked.';
+                feedback.textContent = 'VIP unlocked!';
                 feedback.className = 'vip-feedback success';
                 setTimeout(closeVip, 1200);
             } else {
-                feedback.textContent = '❌ Access denied. You need to own the Diamond Rank gamepass.';
+                feedback.textContent = 'Access denied. You need to own the Diamond Rank!.';
                 feedback.className = 'vip-feedback error';
             }
         });
@@ -1838,42 +1878,8 @@ end)`;
             border-color: #333 transparent transparent transparent;
         }
 
-        .stats-container {
-            display: flex;
-            gap: 20px;
-            align-items: stretch;
-            min-height: 200px;
-        }
-
-        .stats-info-box {
-            flex: 0 0 40%;
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stats-info-label {
-            font-size: 16px;
-            color: #aaa;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .stats-info-price {
-            font-size: 32px;
-            font-weight: 700;
-            color: #fff;
-        }
-
         .stats-chart-wrapper {
-            flex: 1;
-            min-width: 0;
+            width: 100%;
         }
 
         #statsCanvas {
@@ -1885,11 +1891,19 @@ end)`;
             border: 1px solid #333;
         }
 
+        .stats-info-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #4CAF50;
+            text-align: center;
+            margin-top: 4px;
+        }
+
         .stats-original-label {
             font-size: 14px;
             color: #aaa;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 2px;
         }
 
         @media (min-width: 600px) {
@@ -2023,11 +2037,11 @@ end)`;
                 padding: 4px 16px;
                 min-height: 36px;
             }
-            .stats-info-price {
-                font-size: 36px;
-            }
             #statsCanvas {
                 min-height: 220px;
+            }
+            .stats-info-text {
+                font-size: 20px;
             }
         }
 
@@ -2193,19 +2207,11 @@ end)`;
                 padding: 3px 10px;
                 min-height: 28px;
             }
-            .stats-container {
-                flex-direction: column;
-            }
-            .stats-info-box {
-                flex: 1 1 auto;
-                padding: 15px;
-                min-height: 80px;
-            }
-            .stats-info-price {
-                font-size: 24px;
-            }
             #statsCanvas {
                 min-height: 150px;
+            }
+            .stats-info-text {
+                font-size: 16px;
             }
         }
 
@@ -2237,9 +2243,6 @@ end)`;
             .stats-modal,
             .device-modal {
                 padding: 14px 10px 18px 10px;
-            }
-            .stats-info-price {
-                font-size: 20px;
             }
         }
     </style>
