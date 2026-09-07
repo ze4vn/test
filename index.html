@@ -6,6 +6,7 @@
 </head>
 
 <body>
+
   <div id="menu">
     <h1>The Maze V</h1>
     <div class="sub">Select Your Device.</div>
@@ -35,6 +36,7 @@
       <button class="menu-btn" onclick="handleCredits()">Credits</button>
       <button class="menu-btn" onclick="handleExit()">Exit</button>
     </div>
+    <div id="bottom-left">By 44devs</div>
     <div id="logs-btn" onclick="openLogs()">Logs</div>
   </div>
 
@@ -152,12 +154,20 @@ h1 {
 }
 .menu-btn {
   background:none; border:none; color:#b0b0b0;
-  font-size:clamp(1.5rem,6vw,3rem);
+  font-size:clamp(1.2rem, 4vw, 2.8rem); 
   font-family:'Times New Roman', Times, serif; cursor:pointer;
   transition: transform 0.2s, color 0.2s;
   text-align:left; letter-spacing:2px;
 }
 .menu-btn:hover { transform:translateX(10px); color:#fff; }
+.menu-btn:active { color:#fff; transform:translateX(5px); }
+
+#bottom-left {
+  position:fixed; bottom:3vh; left:3vw;
+  color:#444; font-size:clamp(0.7rem,1.5vw,1rem);
+  font-family:'Times New Roman', Times, serif;
+  letter-spacing:2px;
+}
 
 #logs-btn {
   position:fixed; bottom:3vh; right:3vw;
@@ -166,6 +176,7 @@ h1 {
   letter-spacing:2px; transition:color 0.2s;
 }
 #logs-btn:hover { color:#aaa; }
+#logs-btn:active { color:#fff; }
 
 #logs-overlay {
   position:fixed; top:0; left:0; width:100%; height:100%;
