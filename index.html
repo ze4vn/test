@@ -150,33 +150,48 @@ h1 {
 
 #menu-buttons {
   position:absolute; top:50%; left:10%; transform:translateY(-50%);
-  display:flex; flex-direction:column; gap:1.5vh; 
+  display:flex; flex-direction:column; gap:2vh;
 }
 .menu-btn {
   background:none; border:none; color:#b0b0b0;
-  font-size:clamp(0.8rem, 2vw, 2.2rem); 
   font-family:'Times New Roman', Times, serif; cursor:pointer;
   transition: transform 0.2s, color 0.2s;
   text-align:left; letter-spacing:2px;
+  font-size: 2.8rem; 
 }
 .menu-btn:hover { transform:translateX(10px); color:#fff; }
 .menu-btn:active { color:#fff; transform:translateX(5px); }
 
 #bottom-left {
   position:fixed; bottom:3vh; left:3vw;
-  color:#444; font-size:clamp(0.6rem,1.2vw,1rem);
+  color:#444; font-size: clamp(0.7rem, 1.2vw, 1.2rem);
   font-family:'Times New Roman', Times, serif;
   letter-spacing:2px;
 }
 
 #logs-btn {
   position:fixed; bottom:3vh; right:3vw;
-  color:#555; font-size:clamp(0.8rem,1.5vw,1.2rem);
+  color:#555; font-size: clamp(0.9rem, 1.5vw, 1.4rem);
   font-family:'Times New Roman', Times, serif; cursor:pointer;
   letter-spacing:2px; transition:color 0.2s;
 }
 #logs-btn:hover { color:#aaa; }
 #logs-btn:active { color:#fff; }
+
+@media (max-width: 768px) {
+  .menu-btn {
+    font-size: 1.2rem;
+  }
+  #menu-buttons {
+    gap: 1.5vh;
+  }
+  #bottom-left {
+    font-size: 0.7rem;
+  }
+  #logs-btn {
+    font-size: 0.8rem;
+  }
+}
 
 #logs-overlay {
   position:fixed; top:0; left:0; width:100%; height:100%;
