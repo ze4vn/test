@@ -5,7 +5,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
-//yes i needed help from ai and it added // to legit everything lol
+//yes i needed help from ai and it added // to legit everything loll
 
 const MAZE_SIZE = 16;
 const wallHeight = 3.6;
