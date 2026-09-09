@@ -1,4 +1,4 @@
-
+// ─── DOM REFS ──────────────────────────────────────────────
 const menu = document.getElementById('menu');
 const btnMobile = document.getElementById('btnMobile');
 const btnComputer = document.getElementById('btnComputer');
@@ -42,8 +42,7 @@ btnComputer.addEventListener('click', () => {
 
 // ─── MAIN MENU BUTTONS ────────────────────────────────────
 playBtn.addEventListener('click', () => {
-    // Launch the game with the selected mode
-    // Pass the mode as a URL parameter
+    // Launch game with current settings
     window.location.href = `game.html?mode=${selectedMode}&sanity=${sanityOn ? 'on' : 'off'}`;
 });
 
@@ -78,7 +77,6 @@ selExit.addEventListener('click', () => {
 
 selPlay.addEventListener('click', () => {
     selectionOverlay.classList.remove('active');
-    // Launch game with current settings
     window.location.href = `game.html?mode=${selectedMode}&sanity=${sanityOn ? 'on' : 'off'}`;
 });
 
@@ -103,7 +101,7 @@ logsExit.addEventListener('click', () => {
     logsOverlay.classList.remove('show');
 });
 
-// ─── CLICK OUTSIDE TO CLOSE LOGS ─────────────────────────
+// Click outside to close logs
 logsOverlay.addEventListener('click', (e) => {
     if (e.target === logsOverlay) {
         logsOverlay.classList.remove('show');
