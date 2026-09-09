@@ -1169,8 +1169,7 @@ if (isMobile) {
     renderer.setPixelRatio(1);
     renderer.shadowMap.mapSize.width = 1024;
     renderer.shadowMap.mapSize.height = 1024;
-    // Reduce bloom strength
-    bloomStrength = 0.15;
+    // Reduce bloom strength later
 } else {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
@@ -1500,7 +1499,8 @@ const realismShader = {
 const realismPass = new ShaderPass(realismShader);
 composer.addPass(realismPass);
 
-let bloomStrength = 0.25;
+// Bloom strength variable – defined before use
+let bloomStrength = isMobile ? 0.15 : 0.25;
 const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(container.clientWidth, container.clientHeight),
     bloomStrength, 0.15, 0.08
