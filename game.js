@@ -30,11 +30,8 @@ const LIGHT_DETECTION_RADIUS = 5.5;
 const START_TIME = 300;
 
 let sanityEnabled = true;
-let isMobile = false;               // set by menu
+let isMobile = false;            
 
-// ============================================================
-//  DOM REFS & MENU FLOW
-// ============================================================
 const menu = document.getElementById('menu');
 const btnMobile = document.getElementById('btnMobile');
 const btnComputer = document.getElementById('btnComputer');
@@ -58,7 +55,6 @@ const threeContainer = document.getElementById('threeContainer');
 
 let sanityOn = true;
 
-// ---- Menu steps ----
 btnMobile.addEventListener('click', () => {
   isMobile = true;
   menu.classList.add('hide');
@@ -82,7 +78,6 @@ playBtn.addEventListener('click', () => {
 });
 
 settingsBtn.addEventListener('click', () => {
-  // Placeholder
   alert('Settings coming soon');
 });
 
@@ -178,7 +173,6 @@ function startGame(sanityOn) {
   };
   window.addEventListener('resize', resize);
 
-  // ---- Lights ----
   const ambient = new THREE.AmbientLight(0x1a1a2a, 0.45);
   scene.add(ambient);
   const hemi = new THREE.HemisphereLight(0x2a2a3a, 0x0a0a0e, 0.35);
@@ -201,7 +195,6 @@ function startGame(sanityOn) {
   rimLight.position.set(-6, 4, -8);
   scene.add(rimLight);
 
-  // ---- Flashlight ----
   function createFlashlightTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -463,7 +456,6 @@ function startGame(sanityOn) {
   const outputPass = new OutputPass();
   composer.addPass(outputPass);
 
-  // ---- Bodycam ----
   const bodycamCanvas = document.getElementById('bodycamCanvas');
   const bodycamCtx = bodycamCanvas.getContext('2d');
   const bodycamOverlay = document.getElementById('bodycamOverlay');
@@ -717,7 +709,6 @@ function startGame(sanityOn) {
     hint.classList.remove('visible');
   }
 
-  // ---- Maze generation ----
   function generateTunnelMaze(size) {
     const grid = [];
     for (let y = 0; y < size; y++) {
@@ -1417,25 +1408,22 @@ function startGame(sanityOn) {
   let currentSize = MAZE_SIZE;
   let currentHalf = (MAZE_SIZE - 1) / 2;
 
-  // ---- Mobile joystick state ----
   let joystickActive = false;
   let joystickTouchId = null;
   let joystickDir = { x: 0, y: 0 };
   let joystickMagnitude = 0;
-  // Look touch state
+
   let lookTouchId = null;
   let lastLookX = 0, lastLookY = 0;
-  // Tap detection
+
   let tapStartTime = 0;
   let tapStartPos = { x: 0, y: 0 };
   let isTapPossible = false;
 
-  // ---- DOM refs for mobile ----
   const joystickContainer = document.getElementById('joystickContainer');
   const joystickKnob = document.getElementById('joystickKnob');
   const sanityContainer = document.getElementById('sanityContainer');
 
-  // Show joystick if mobile
   if (isMobile) {
     joystickContainer.style.display = 'block';
     sanityContainer.classList.add('mobile-sanity');
@@ -1444,7 +1432,6 @@ function startGame(sanityOn) {
     sanityContainer.classList.remove('mobile-sanity');
   }
 
-  // ---- Touch handlers ----
   function handleTouchStart(e) {
     if (isDead || isTransitioning) return;
     e.preventDefault();
@@ -1454,17 +1441,16 @@ function startGame(sanityOn) {
       const touchX = touch.clientX;
       const touchY = touch.clientY;
 
-      // Check if touch is inside joystick container
       if (touchX >= rect.left && touchX <= rect.right &&
           touchY >= rect.top && touchY <= rect.bottom) {
-        // Joystick touch
+
         if (joystickTouchId === null) {
           joystickTouchId = touch.identifier;
           joystickActive = true;
           updateJoystick(touch);
         }
       } else {
-        // Look / tap touch
+
         if (lookTouchId === null) {
           lookTouchId = touch.identifier;
           lastLookX = touch.clientX;
@@ -1490,7 +1476,7 @@ function startGame(sanityOn) {
       if (touch.identifier === lookTouchId) {
         const dx = touch.clientX - lastLookX;
         const dy = touch.clientY - lastLookY;
-        // Apply rotation (sensitivity)
+  
         const sens = 0.004;
         yaw -= dx * sens;
         pitch -= dy * sens;
@@ -1499,7 +1485,7 @@ function startGame(sanityOn) {
         camera.rotation.x = pitch;
         lastLookX = touch.clientX;
         lastLookY = touch.clientY;
-        // update movement smooth values
+
         smoothMoveX += dx * 0.0008;
         smoothMoveY += dy * 0.0008;
         smoothMoveX *= 0.92;
@@ -1507,7 +1493,7 @@ function startGame(sanityOn) {
         headTilt = -dx * 2.5;
         smoothHeadTilt += (headTilt - smoothHeadTilt) * 0.08;
         mouseSpeed = Math.sqrt(dx*dx + dy*dy) * 0.02;
-        // Tap is cancelled if movement > threshold
+
         if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
           isTapPossible = false;
         }
@@ -1529,16 +1515,16 @@ function startGame(sanityOn) {
       }
       if (touch.identifier === lookTouchId) {
         lookTouchId = null;
-        // Check if it was a tap (short touch, little movement)
+
         if (isTapPossible) {
           const dt = performance.now() - tapStartTime;
           const dist = Math.hypot(touch.clientX - tapStartPos.x, touch.clientY - tapStartPos.y);
           if (dt < 200 && dist < 30) {
-            // Toggle flashlight
+
             if (!redModeActive) {
               flashlightOn = !flashlightOn;
               const hint = document.getElementById('flashlightHint');
-              hint.textContent = flashlightOn ? 'click to toggle flashlight' : '🔦 flashlight off';
+              hint.textContent = flashlightOn ? 'click to toggle flashlight' : ' flashlight off';
               hint.classList.add('visible');
               clearTimeout(window._hintTimeout);
               window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
@@ -1554,7 +1540,7 @@ function startGame(sanityOn) {
     const rect = joystickContainer.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const radius = rect.width / 2 - 25; // knob radius
+    const radius = rect.width / 2 - 25;
     let dx = touch.clientX - cx;
     let dy = touch.clientY - cy;
     const dist = Math.hypot(dx, dy);
@@ -1563,24 +1549,22 @@ function startGame(sanityOn) {
     const angle = Math.atan2(dy, dx);
     const limitedDx = Math.cos(angle) * clampedDist;
     const limitedDy = Math.sin(angle) * clampedDist;
-    // Move knob
+
     joystickKnob.style.transform = `translate(${-25 + limitedDx}px, ${-25 + limitedDy}px)`;
-    // Normalize direction and magnitude (0..1)
+
     const norm = clampedDist / maxDist;
     const dirX = limitedDx / maxDist;
     const dirY = limitedDy / maxDist;
     joystickDir.x = dirX;
-    joystickDir.y = -dirY;  // y inverted because screen y goes down
+    joystickDir.y = -dirY;  
     joystickMagnitude = norm;
   }
 
-  // Register touch events (on document)
   document.addEventListener('touchstart', handleTouchStart, { passive: false });
   document.addEventListener('touchmove', handleTouchMove, { passive: false });
   document.addEventListener('touchend', handleTouchEnd, { passive: false });
   document.addEventListener('touchcancel', handleTouchEnd, { passive: false });
 
-  // ---- Keyboard events (still active for desktop) ----
   document.addEventListener('keydown', (e) => {
     if (e.key === ' ') e.preventDefault();
     const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
@@ -1591,8 +1575,7 @@ function startGame(sanityOn) {
     keys[e.key.length === 1 ? e.key.toUpperCase() : e.key] = false;
     if (e.key === 'Shift') isSprinting = false;
   });
-
-  // ---- Mouse look (desktop) ----
+  
   document.addEventListener('mousemove', (e) => {
     if (!isLocked || isTransitioning) return;
     const sens = 0.0018;
@@ -1612,11 +1595,10 @@ function startGame(sanityOn) {
     mouseSpeed = speed * 0.02;
   });
 
-  // ---- Pointer lock (desktop) ----
   renderer.domElement.addEventListener('click', () => {
     if (redModeActive) return;
     if (isLocked) {
-      // toggle flashlight
+      
       flashlightOn = !flashlightOn;
       const hint = document.getElementById('flashlightHint');
       hint.textContent = flashlightOn ? 'click to toggle flashlight' : '🔦 flashlight off';
@@ -1641,12 +1623,10 @@ function startGame(sanityOn) {
     }
   });
 
-  // For mobile, we simulate "locked" state always true (since we use touch look)
   if (isMobile) {
-    isLocked = true; // we always control with touch
+    isLocked = true; 
   }
 
-  // ---- Misc game functions ----
   function getTerrainHeight(worldX, worldZ) { return 0; }
 
   function generateLevel(level) {
@@ -1930,13 +1910,11 @@ function startGame(sanityOn) {
     }
   }
 
-  // ---- Death buttons ----
   document.getElementById('btnRespawn').addEventListener('click', () => respawn());
   document.getElementById('btnMainMenu').addEventListener('click', () => mainMenu());
   document.getElementById('btnRestartLevels').addEventListener('click', () => restartLevels());
   document.getElementById('winContinue').addEventListener('click', () => location.reload());
 
-  // ---- Init ----
   generateLevel(0);
 
   // ---- Animation Loop ----
@@ -2054,7 +2032,6 @@ function startGame(sanityOn) {
 
     updateMazeShifting(time, dt);
 
-    // ---- Stamina ----
     const canSprint = isSprinting && isMoving && onGround && stamina > 0 && !isDead;
     if (canSprint) {
       stamina = Math.max(0, stamina - STAMINA_DRAIN * dt * (fightOrFlightActive ? 0.8 : 1.0));
@@ -2138,24 +2115,20 @@ function startGame(sanityOn) {
 
     if (!isTransitioning && gameRunning && isLocked) checkTeleporter();
 
-    // ---- Movement ----
     if (!isTransitioning && gameRunning && isLocked && !isDead) {
       const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
       const strafe = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
 
-      // Compute input from keyboard or joystick
       let moveX_ = 0, moveZ_ = 0;
-      // Keyboard
+
       if (keys['W'] || keys['ArrowUp']) { moveX_ += forward.x; moveZ_ += forward.z; }
       if (keys['S'] || keys['ArrowDown']) { moveX_ -= forward.x; moveZ_ -= forward.z; }
       if (keys['A'] || keys['ArrowLeft']) { moveX_ -= strafe.x; moveZ_ -= strafe.z; }
       if (keys['D'] || keys['ArrowRight']) { moveX_ += strafe.x; moveZ_ += strafe.z; }
 
-      // Joystick (add to keyboard input)
       if (joystickActive && joystickMagnitude > 0.1) {
         const jx = joystickDir.x;
         const jy = joystickDir.y;
-        // Combine with keyboard (allow both)
         moveX_ += forward.x * jy + strafe.x * jx;
         moveZ_ += forward.z * jy + strafe.z * jx;
       }
