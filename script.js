@@ -59,7 +59,7 @@ export function startGame(sanityOn) {
 
     const resize = () => {
         const w = container.clientWidth, h = container.clientHeight;
-        if (w === 0 || h === 0) return; // guard
+        if (w === 0 || h === 0) return;
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
