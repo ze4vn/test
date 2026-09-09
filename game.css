@@ -1,65 +1,535 @@
+/* ─── RESET & BASE ─────────────────────────────────────────── */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Times New Roman', Times, serif;
+    cursor: default;
+    touch-action: none;
+    overscroll-behavior: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
 
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:'Times New Roman', Times, serif; cursor:default; }
-#gameOverlay { position:fixed; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#000; }
-#gameOverlay .gameBg { position:absolute; inset:0; background:#05050a; z-index:0; }
-#gameOverlay .gameContent { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; }
-#threeContainer { position:absolute; inset:0; z-index:0; width:100%; height:100%; }
-#winOverlay { position:absolute; inset:0; background:rgba(0,0,0,0.92); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; font-family:'Times New Roman', Times, serif; }
-#winOverlay.active { display:flex; }
-#winOverlay .winText { font-size:clamp(50px,8vw,90px); color:#eaeaea; text-shadow:0 0 40px rgba(255,255,255,0.25); animation:winPulse 1.5s ease-in-out infinite alternate; }
-@keyframes winPulse { from{transform:scale(1);text-shadow:0 0 40px rgba(255,255,255,0.12)} to{transform:scale(1.05);text-shadow:0 0 80px rgba(255,255,255,0.4)} }
-#winOverlay .winSub { color:rgba(255,255,255,0.55); font-size:20px; margin-top:10px; cursor:pointer; transition:0.2s; }
-#winOverlay .winSub:hover { color:#fff; }
-#whiteFlash { position:fixed; inset:0; background:white; z-index:99999; pointer-events:none; opacity:0; transition:opacity 0.1s; }
-#blackFade { position:fixed; inset:0; background:black; z-index:99997; pointer-events:none; opacity:0; transition:opacity 0.8s ease; }
-#levelMsg { display:none !important; }
-#infoPanel { position:fixed; top:10px; left:10px; background:rgba(0,0,0,0.75); color:#8af; padding:10px 14px; font-family:'Courier New', monospace; font-size:12px; z-index:10001; display:none; border:1px solid #444; border-radius:4px; pointer-events:none; text-shadow:0 0 4px rgba(0,0,0,0.9); line-height:1.5; min-width:200px; backdrop-filter:blur(4px); user-select:none; }
-#infoPanel .label { color:#8af; }
-#staminaContainer { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); width:220px; height:4px; background:rgba(255,255,255,0.12); border-radius:2px; z-index:10000; pointer-events:none; overflow:hidden; opacity:0; transition:opacity 0.3s ease; }
-#staminaBar { width:100%; height:100%; background:#fff; border-radius:2px; transition:width 0.05s linear; box-shadow:0 0 8px rgba(255,255,255,0.3); }
-#staminaBar.low { background:#ff3333; box-shadow:0 0 12px rgba(255,0,0,0.5); }
-#staminaBar.fight-or-flight { background:#ff8844; box-shadow:0 0 12px rgba(255,136,68,0.4); }
-#levelTitleContainer { position:fixed; bottom:42px; left:50%; transform:translateX(-50%); z-index:9999; pointer-events:none; text-align:center; opacity:0; transition:opacity 1.2s ease; font-family:'Times New Roman', Times, serif; text-shadow:0 0 30px rgba(0,0,0,0.9); }
-#levelTitleContainer.visible { opacity:1; }
-#levelTitleContainer .level-title-main { font-size:26px; color:#ffffff; letter-spacing:3px; font-weight:normal; }
-#levelTitleContainer .level-title-sub { font-size:14px; color:rgba(255,255,255,0.5); letter-spacing:6px; margin-top:2px; text-transform:uppercase; }
-#sanityContainer { position:fixed; bottom:50px; left:20px; z-index:9999; pointer-events:none; }
-#sanityCircle { width:70px; height:70px; border-radius:50%; background:rgba(0,0,0,0.85); border:2px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; align-items:center; justify-content:center; backdrop-filter:blur(6px); box-shadow:0 0 40px rgba(0,0,0,0.8); transition:border-color 0.5s ease, box-shadow 0.5s ease; }
-#sanityCircle.danger { border-color:rgba(255,0,0,0.4); animation:sanityGlow 0.8s ease-in-out infinite alternate; }
-@keyframes sanityGlow { from{box-shadow:0 0 20px rgba(255,0,0,0.1)} to{box-shadow:0 0 80px rgba(255,0,0,0.3)} }
-#sanityLetter { font-family:'Times New Roman', serif; font-size:40px; font-weight:normal; color:rgba(255,255,255,0.9); text-shadow:none; user-select:none; line-height:1; transition:color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease; }
-#sanityLetter.level-A { color:rgba(255,255,255,0.9); }
-#sanityLetter.level-B { color:rgba(255,255,200,0.85); }
-#sanityLetter.level-C { color:rgba(255,200,150,0.85); }
-#sanityLetter.level-D { color:#ff4444; text-shadow:0 0 16px rgba(255,68,68,0.3); }
-#sanityLetter.level-E { color:#cc2222; text-shadow:0 0 20px rgba(204,34,34,0.4); }
-#sanityLetter.level-F { color:#881111; font-weight:bold; text-shadow:0 0 30px rgba(136,17,17,0.6); }
-#sanityLetter.level-below-f { color:#660000 !important; font-weight:bold !important; animation:letterPulse 0.3s ease-in-out infinite alternate; text-shadow:0 0 50px rgba(100,0,0,0.9) !important; }
-@keyframes letterPulse { from{transform:scale(1);opacity:0.8} to{transform:scale(1.15);opacity:1} }
-#sanityLabel { font-family:'Times New Roman', serif; font-size:7px; color:rgba(255,255,255,0.12); letter-spacing:2px; text-transform:uppercase; margin-top:1px; user-select:none; }
-#bodycamOverlay { position:fixed; inset:0; z-index:9998; pointer-events:none; opacity:0; transition:opacity 0.8s ease; mix-blend-mode:screen; }
-#bodycamOverlay.active { opacity:1; }
-#bodycamOverlay canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
-#schizoOverlay { position:fixed; inset:0; z-index:9997; pointer-events:none; opacity:0; transition:opacity 0.6s ease; background:transparent; }
-#schizoOverlay.active { opacity:1; background:radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(8,0,0,0.25) 100%); }
-#schizoOverlay.intense { opacity:1; background:radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(16,0,0,0.40) 100%); }
-#timerContainer { position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:10002; font-family:'Courier New', monospace; font-size:22px; color:rgba(255,255,255,0.7); text-shadow:0 0 20px rgba(0,0,0,0.9); background:rgba(0,0,0,0.5); padding:6px 18px; border-radius:4px; backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,0.06); letter-spacing:1px; user-select:none; pointer-events:none; transition:color 0.5s ease, border-color 0.5s ease; }
-#timerContainer.low-time { color:#ff4444; border-color:rgba(255,68,68,0.3); animation:timerPulse 1s ease-in-out infinite alternate; }
-#timerContainer.critical-time { color:#ff0000; border-color:rgba(255,0,0,0.6); animation:timerPulse 0.3s ease-in-out infinite alternate; font-weight:bold; background:rgba(30,0,0,0.7); }
-@keyframes timerPulse { from{opacity:0.6;transform:translateX(-50%) scale(1)} to{opacity:1;transform:translateX(-50%) scale(1.04)} }
-#flashlightHint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:9998; color:rgba(255,255,255,0.15); font-size:12px; font-family:'Times New Roman', serif; letter-spacing:2px; pointer-events:none; opacity:0; transition:opacity 1s ease; text-shadow:0 0 20px rgba(0,0,0,0.9); }
-#flashlightHint.visible { opacity:1; }
-#deathOverlay { position:fixed; inset:0; z-index:100000; background:black; display:none; flex-direction:column; align-items:center; justify-content:center; font-family:'Times New Roman', Times, serif; color:white; pointer-events:none; }
-#deathOverlay.active { display:flex; pointer-events:auto; }
-#deathRedOverlay { position:absolute; inset:0; background:radial-gradient(ellipse at center, transparent 40%, rgba(255,0,0,0.9) 100%); opacity:0; pointer-events:none; transition:opacity 0.6s ease; }
-#deathRedOverlay.show { opacity:1; }
-#deathWhiteFlash { position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.08s ease; }
-#deathWhiteFlash.flash { opacity:1; }
-#deathContent { position:relative; z-index:1; text-align:center; opacity:0; transition:opacity 0.8s ease; }
-#deathContent.show { opacity:1; }
-#deathContent h1 { font-size:72px; margin-bottom:40px; text-shadow:0 0 60px rgba(255,0,0,0.5); color:#ff2222; letter-spacing:4px; }
-#deathContent .death-sub { color:rgba(255,255,255,0.4); font-size:18px; margin-bottom:30px; letter-spacing:2px; }
-#deathButtons { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
-#deathButtons button { padding:12px 30px; font-size:18px; font-family:'Times New Roman', serif; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:#ccc; cursor:pointer; border-radius:4px; transition:0.3s; min-width:140px; letter-spacing:1px; }
-#deathButtons button:hover { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.3); color:#fff; transform:scale(1.02); }
+/* ─── GAME OVERLAY ─────────────────────────────────────────── */
+#gameOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+#gameOverlay .gameBg {
+    position: absolute;
+    inset: 0;
+    background: #05050a;
+    z-index: 0;
+}
+#gameOverlay .gameContent {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+#threeContainer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ─── WIN OVERLAY ──────────────────────────────────────────── */
+#winOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    font-family: 'Times New Roman', Times, serif;
+}
+#winOverlay.active {
+    display: flex;
+}
+#winOverlay .winText {
+    font-size: clamp(50px, 8vw, 90px);
+    color: #eaeaea;
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
+    animation: winPulse 1.5s ease-in-out infinite alternate;
+}
+@keyframes winPulse {
+    from {
+        transform: scale(1);
+        text-shadow: 0 0 40px rgba(255, 255, 255, 0.12);
+    }
+    to {
+        transform: scale(1.05);
+        text-shadow: 0 0 80px rgba(255, 255, 255, 0.4);
+    }
+}
+#winOverlay .winSub {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+#winOverlay .winSub:hover {
+    color: #fff;
+}
+
+/* ─── FLASH / FADE ─────────────────────────────────────────── */
+#whiteFlash {
+    position: fixed;
+    inset: 0;
+    background: white;
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+#blackFade {
+    position: fixed;
+    inset: 0;
+    background: black;
+    z-index: 99997;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+#levelMsg {
+    display: none !important;
+}
+
+/* ─── INFO PANEL ───────────────────────────────────────────── */
+#infoPanel {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #8af;
+    padding: 10px 14px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    z-index: 10001;
+    display: none;
+    border: 1px solid #444;
+    border-radius: 4px;
+    pointer-events: none;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+    line-height: 1.5;
+    min-width: 200px;
+    backdrop-filter: blur(4px);
+    user-select: none;
+}
+#infoPanel .label {
+    color: #8af;
+}
+
+/* ─── STAMINA BAR ──────────────────────────────────────────── */
+#staminaContainer {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    z-index: 10000;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+#staminaBar {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 2px;
+    transition: width 0.05s linear;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+#staminaBar.low {
+    background: #ff3333;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.5);
+}
+#staminaBar.fight-or-flight {
+    background: #ff8844;
+    box-shadow: 0 0 12px rgba(255, 136, 68, 0.4);
+}
+
+/* ─── LEVEL TITLE ──────────────────────────────────────────── */
+#levelTitleContainer {
+    position: fixed;
+    bottom: 42px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    pointer-events: none;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    font-family: 'Times New Roman', Times, serif;
+    text-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+}
+#levelTitleContainer.visible {
+    opacity: 1;
+}
+#levelTitleContainer .level-title-main {
+    font-size: 26px;
+    color: #ffffff;
+    letter-spacing: 3px;
+    font-weight: normal;
+}
+#levelTitleContainer .level-title-sub {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 6px;
+    margin-top: 2px;
+    text-transform: uppercase;
+}
+
+/* ─── SANITY UI ────────────────────────────────────────────── */
+#sanityContainer {
+    position: fixed;
+    bottom: 50px;
+    left: 20px;
+    z-index: 9999;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+/* Mobile: sanity moves to top-right */
+#sanityContainer.mobile-sanity {
+    bottom: auto !important;
+    left: auto !important;
+    top: 20px !important;
+    right: 20px !important;
+}
+#sanityCircle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+#sanityCircle.danger {
+    border-color: rgba(255, 0, 0, 0.4);
+    animation: sanityGlow 0.8s ease-in-out infinite alternate;
+}
+@keyframes sanityGlow {
+    from {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.1);
+    }
+    to {
+        box-shadow: 0 0 80px rgba(255, 0, 0, 0.3);
+    }
+}
+#sanityLetter {
+    font-family: 'Times New Roman', serif;
+    font-size: 40px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: none;
+    user-select: none;
+    line-height: 1;
+    transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
+}
+#sanityLetter.level-A {
+    color: rgba(255, 255, 255, 0.9);
+}
+#sanityLetter.level-B {
+    color: rgba(255, 255, 200, 0.85);
+}
+#sanityLetter.level-C {
+    color: rgba(255, 200, 150, 0.85);
+}
+#sanityLetter.level-D {
+    color: #ff4444;
+    text-shadow: 0 0 16px rgba(255, 68, 68, 0.3);
+}
+#sanityLetter.level-E {
+    color: #cc2222;
+    text-shadow: 0 0 20px rgba(204, 34, 34, 0.4);
+}
+#sanityLetter.level-F {
+    color: #881111;
+    font-weight: bold;
+    text-shadow: 0 0 30px rgba(136, 17, 17, 0.6);
+}
+#sanityLetter.level-below-f {
+    color: #660000 !important;
+    font-weight: bold !important;
+    animation: letterPulse 0.3s ease-in-out infinite alternate;
+    text-shadow: 0 0 50px rgba(100, 0, 0, 0.9) !important;
+}
+@keyframes letterPulse {
+    from {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    to {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}
+#sanityLabel {
+    font-family: 'Times New Roman', serif;
+    font-size: 7px;
+    color: rgba(255, 255, 255, 0.12);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 1px;
+    user-select: none;
+}
+
+/* ─── MOBILE JOYSTICK ──────────────────────────────────────── */
+#joystickContainer {
+    position: fixed;
+    bottom: 40px;
+    left: 40px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    display: none;  /* hidden by default, shown only in mobile mode */
+    touch-action: none;
+    z-index: 9999;
+    pointer-events: auto;
+}
+#joystickKnob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
+    margin-top: -25px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+    transition: transform 0.05s linear;
+}
+
+/* ─── BODYCAM OVERLAY ──────────────────────────────────────── */
+#bodycamOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    mix-blend-mode: screen;
+}
+#bodycamOverlay.active {
+    opacity: 1;
+}
+#bodycamOverlay canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ─── SCHIZO OVERLAY ───────────────────────────────────────── */
+#schizoOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9997;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    background: transparent;
+}
+#schizoOverlay.active {
+    opacity: 1;
+    background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(8, 0, 0, 0.25) 100%);
+}
+#schizoOverlay.intense {
+    opacity: 1;
+    background: radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(16, 0, 0, 0.40) 100%);
+}
+
+/* ─── TIMER ────────────────────────────────────────────────── */
+#timerContainer {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10002;
+    font-family: 'Courier New', monospace;
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 6px 18px;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    letter-spacing: 1px;
+    user-select: none;
+    pointer-events: none;
+    transition: color 0.5s ease, border-color 0.5s ease;
+}
+#timerContainer.low-time {
+    color: #ff4444;
+    border-color: rgba(255, 68, 68, 0.3);
+    animation: timerPulse 1s ease-in-out infinite alternate;
+}
+#timerContainer.critical-time {
+    color: #ff0000;
+    border-color: rgba(255, 0, 0, 0.6);
+    animation: timerPulse 0.3s ease-in-out infinite alternate;
+    font-weight: bold;
+    background: rgba(30, 0, 0, 0.7);
+}
+@keyframes timerPulse {
+    from {
+        opacity: 0.6;
+        transform: translateX(-50%) scale(1);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.04);
+    }
+}
+
+/* ─── FLASHLIGHT HINT ──────────────────────────────────────── */
+#flashlightHint {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9998;
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 12px;
+    font-family: 'Times New Roman', serif;
+    letter-spacing: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+}
+#flashlightHint.visible {
+    opacity: 1;
+}
+
+/* ─── DEATH OVERLAY ────────────────────────────────────────── */
+#deathOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: black;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+    pointer-events: none;
+}
+#deathOverlay.active {
+    display: flex;
+    pointer-events: auto;
+}
+#deathRedOverlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 0, 0, 0.9) 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+}
+#deathRedOverlay.show {
+    opacity: 1;
+}
+#deathWhiteFlash {
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.08s ease;
+}
+#deathWhiteFlash.flash {
+    opacity: 1;
+}
+#deathContent {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+#deathContent.show {
+    opacity: 1;
+}
+#deathContent h1 {
+    font-size: 72px;
+    margin-bottom: 40px;
+    text-shadow: 0 0 60px rgba(255, 0, 0, 0.5);
+    color: #ff2222;
+    letter-spacing: 4px;
+}
+#deathContent .death-sub {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 18px;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+#deathButtons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+#deathButtons button {
+    padding: 12px 30px;
+    font-size: 18px;
+    font-family: 'Times New Roman', serif;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+    min-width: 140px;
+    letter-spacing: 1px;
+}
+#deathButtons button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.02);
+}
