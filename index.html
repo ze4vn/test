@@ -9,7 +9,7 @@
 
   <div id="menu">
     <h1>The Maze V</h1>
-    <h4>[3% Done]</h4>
+    <h4>[4% Done]</h4>
     <div class="sub">Select Your Device.</div>
     <div class="btn-group">
       <button class="btn" onclick="selectDevice('Mobile')">Mobile</button>
@@ -42,20 +42,67 @@
   </div>
 
   <div id="selection-overlay">
-
     <div class="sel-title">Selection</div>
-
     <button class="sel-btn sel-exit" onclick="closeSelection()">← Exit</button>
-
     <button class="sel-btn sel-play" onclick="confirmPlay()">Play →</button>
 
     <div class="sel-settings">
       <div class="sel-setting-row">
         <span class="label">Sanity Mode</span>
-        <div class="toggle-switch on" id="sanityToggle" onclick="toggleSanity()">
+        <div class="toggle-switch on" id="sanityToggle" onclick="toggleSetting('sanity')">
           <div class="toggle-knob"></div>
         </div>
         <span class="status on" id="sanityStatus">ON</span>
+      </div>
+      <div class="sel-setting-row">
+        <span class="label">Fish Eye</span>
+        <div class="toggle-switch" id="fisheyeToggle" onclick="toggleSetting('fisheye')">
+          <div class="toggle-knob"></div>
+        </div>
+        <span class="status" id="fisheyeStatus">OFF</span>
+      </div>
+      <div class="sel-setting-row">
+        <span class="label">Glitch Effect</span>
+        <div class="toggle-switch" id="glitchToggle" onclick="toggleSetting('glitch')">
+          <div class="toggle-knob"></div>
+        </div>
+        <span class="status" id="glitchStatus">OFF</span>
+      </div>
+      <div class="sel-setting-row">
+        <span class="label">Chromatic Aberration</span>
+        <div class="toggle-switch" id="chromaToggle" onclick="toggleSetting('chroma')">
+          <div class="toggle-knob"></div>
+        </div>
+        <span class="status" id="chromaStatus">OFF</span>
+      </div>
+      <div class="sel-setting-row">
+        <span class="label">Motion Blur</span>
+        <div class="toggle-switch" id="motionBlurToggle" onclick="toggleSetting('motionBlur')">
+          <div class="toggle-knob"></div>
+        </div>
+        <span class="status" id="motionBlurStatus">OFF</span>
+      </div>
+      <div class="sel-setting-row">
+        <span class="label">Vignette</span>
+        <div class="toggle-switch on" id="vignetteToggle" onclick="toggleSetting('vignette')">
+          <div class="toggle-knob"></div>
+        </div>
+        <span class="status on" id="vignetteStatus">ON</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="credits-overlay">
+    <div id="credits-bg"></div>
+    <div id="credits-exit" onclick="closeCredits()">← Exit</div>
+    <div id="credits-title">Credits</div>
+    <div id="credits-scroll">
+      <div id="credits-content">
+        <p style="font-size:clamp(2rem,5vw,3.5rem); margin-bottom:6vh;">~ Developers ~</p>
+        <p style="font-size:clamp(3.5rem,8vw,6rem); font-weight:700; letter-spacing:12px; color:#fff;">44devs</p>
+        <p style="margin-top:8vh; font-size:clamp(1.2rem,2.5vw,2rem); color:#aaa;">~ Artists ~</p>
+        <p style="font-size:clamp(2rem,4vw,3rem); color:#ddd; letter-spacing:4px;">Susanna Delelis</p>
+        <p style="margin-top:10vh; font-size:clamp(0.8rem,1.5vw,1.2rem); color:#666;">Thank you for playing</p>
       </div>
     </div>
   </div>
@@ -69,16 +116,11 @@
       <div id="logs-content">
         <p id="logs-version">0.0.1</p>
         <p id="logs-date">Monday 7th September</p>
-                <p id="logs-version">0.0.2</p>
-        <p id="logs-date">Wensday 9th September</p>
       </div>
     </div>
   </div>
 
-  
-
   <style>
-
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body {
       width:100%; height:100%; overflow:hidden; position:fixed; top:0; left:0;
@@ -168,7 +210,6 @@
       font-weight:700; letter-spacing:8px;
       font-family:'Times New Roman', Times, serif;
     }
-
     #menu-buttons {
       position:absolute; top:50%; left:10%; transform:translateY(-50%);
       display:flex; flex-direction:column; gap:2vh;
@@ -182,14 +223,12 @@
     }
     .menu-btn:hover { transform:translateX(10px); color:#fff; }
     .menu-btn:active { color:#fff; transform:translateX(5px); }
-
     #bottom-left {
       position:fixed; bottom:3vh; left:3vw;
       color:#444; font-size: clamp(0.7rem, 1.2vw, 1.2rem);
       font-family:'Times New Roman', Times, serif;
       letter-spacing:2px;
     }
-
     #logs-btn {
       position:fixed; bottom:3vh; right:3vw;
       color:#555; font-size: clamp(0.9rem, 1.5vw, 1.4rem);
@@ -198,7 +237,6 @@
     }
     #logs-btn:hover { color:#aaa; }
     #logs-btn:active { color:#fff; }
-
     @media (max-width: 768px) {
       .menu-btn { font-size: 1.2rem; }
       #menu-buttons { gap: 1.5vh; }
@@ -210,14 +248,14 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.94);
+      background: #f5f5f5;
       z-index: 9999;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.6s ease;
       pointer-events: none;
     }
     #selection-overlay.active {
@@ -225,26 +263,23 @@
       opacity: 1;
       pointer-events: auto;
     }
-
     #selection-overlay .sel-title {
       position: absolute;
       top: 4vh;
       left: 50%;
       transform: translateX(-50%);
-      color: #fff;
+      color: #111;
       font-size: clamp(1.8rem, 6vw, 3.2rem);
       letter-spacing: 8px;
       font-family: 'Times New Roman', Times, serif;
       font-weight: 400;
-      text-shadow: 0 0 40px rgba(255,255,255,0.05);
     }
-
     .sel-btn {
       position: absolute;
       top: 4vh;
       background: none;
       border: none;
-      color: #888;
+      color: #333;
       font-size: clamp(1rem, 2.5vw, 1.4rem);
       cursor: pointer;
       font-family: 'Times New Roman', Times, serif;
@@ -252,24 +287,17 @@
       transition: color 0.2s, transform 0.2s;
       padding: 8px 16px;
     }
-    .sel-btn:hover { color: #fff; transform: scale(1.05); }
+    .sel-btn:hover { color: #000; transform: scale(1.05); }
     .sel-btn:active { transform: scale(0.95); }
-
-    .sel-exit {
-      left: 5vw;
-    }
-    .sel-exit:hover { color: #ff6666; }
-
-    .sel-play {
-      right: 5vw;
-      color: #fff;
-    }
-    .sel-play:hover { color: #ffddaa; }
+    .sel-exit { left: 5vw; }
+    .sel-exit:hover { color: #c0392b; }
+    .sel-play { right: 5vw; color: #111; }
+    .sel-play:hover { color: #2c3e50; }
 
     .sel-settings {
       display: flex;
       flex-direction: column;
-      gap: 3vh;
+      gap: 2.5vh;
       align-items: center;
       margin-top: 2vh;
     }
@@ -277,54 +305,136 @@
       display: flex;
       align-items: center;
       gap: 3vw;
-      color: #ccc;
+      color: #222;
       font-size: clamp(1rem, 2.5vw, 1.5rem);
       font-family: 'Times New Roman', Times, serif;
     }
     .sel-setting-row .label {
-      min-width: 120px;
+      min-width: 140px;
       text-align: right;
-      color: #aaa;
+      color: #444;
       letter-spacing: 1px;
     }
-
     .toggle-switch {
       width: 60px;
       height: 30px;
-      background: #333;
+      background: #ccc;
       border-radius: 15px;
       cursor: pointer;
       position: relative;
       transition: background 0.3s;
       flex-shrink: 0;
     }
-    .toggle-switch.on { background: #6a4a2a; }
+    .toggle-switch.on { background: #2c3e50; }
     .toggle-switch .toggle-knob {
       width: 24px;
       height: 24px;
-      background: #888;
+      background: #fff;
       border-radius: 50%;
       position: absolute;
       top: 3px;
       left: 3px;
       transition: transform 0.3s, background 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     .toggle-switch.on .toggle-knob {
       transform: translateX(30px);
-      background: #ffddaa;
+      background: #ecf0f1;
     }
     .sel-setting-row .status {
       font-size: clamp(0.7rem, 1.5vw, 1rem);
-      color: #666;
+      color: #888;
       min-width: 40px;
       transition: color 0.3s;
     }
-    .sel-setting-row .status.on { color: #ffddaa; }
+    .sel-setting-row .status.on { color: #2c3e50; font-weight: bold; }
+
+    #credits-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    #credits-overlay.active {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #credits-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      z-index: -1;
+    }
+    #credits-exit {
+      position: absolute;
+      top: 3vh;
+      left: 5vw;
+      color: #888;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      cursor: pointer;
+      font-family: 'Times New Roman', Times, serif;
+      letter-spacing: 2px;
+      z-index: 10;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+    }
+    #credits-exit:hover { color: #fff; }
+    #credits-title {
+      position: absolute;
+      top: 3vh;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 12px;
+      font-weight: 300;
+      font-family: 'Times New Roman', Times, serif;
+      z-index: 10;
+    }
+    #credits-scroll {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    #credits-content {
+      color: #ccc;
+      text-align: center;
+      font-family: 'Times New Roman', Times, serif;
+      padding: 10vh 5vw;
+      animation: scrollCredits 20s linear infinite;
+      will-change: transform;
+    }
+    @keyframes scrollCredits {
+      0% { transform: translateY(100vh); }
+      100% { transform: translateY(-100%); }
+    }
+    #credits-content p {
+      margin: 2vh 0;
+      line-height: 1.6;
+    }
 
     #logs-overlay {
       position:fixed; top:0; left:0; width:100%; height:100%;
       background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
-      z-index:200; display:flex; justify-content:center; align-items:center;
+      z-index:300; display:flex; justify-content:center; align-items:center;
       opacity:0; pointer-events:none; transition: opacity 0.4s ease;
     }
     #logs-overlay.show { opacity:1; pointer-events:auto; }
@@ -353,8 +463,14 @@
   </style>
 
   <script>
-
-    let sanityEnabled = true; 
+    let settings = {
+      sanity: true,
+      fisheye: false,
+      glitch: false,
+      chroma: false,
+      motionBlur: false,
+      vignette: true
+    };
 
     function selectDevice(device) {
       if (document.documentElement.requestFullscreen) {
@@ -398,11 +514,11 @@
     }
 
     function handleSettings() {
-      alert('Settings – coming soon!');
+      document.getElementById('selection-overlay').classList.add('active');
     }
 
     function handleCredits() {
-      alert('The Maze V — Made by 44devs');
+      document.getElementById('credits-overlay').classList.add('active');
     }
 
     function handleExit() {
@@ -415,23 +531,23 @@
       document.getElementById('selection-overlay').classList.remove('active');
     }
 
-    function toggleSanity() {
-      var toggle = document.getElementById('sanityToggle');
-      var status = document.getElementById('sanityStatus');
+    function toggleSetting(name) {
+      const toggle = document.getElementById(name + 'Toggle');
+      const status = document.getElementById(name + 'Status');
       toggle.classList.toggle('on');
-      var isOn = toggle.classList.contains('on');
+      const isOn = toggle.classList.contains('on');
       status.textContent = isOn ? 'ON' : 'OFF';
       status.classList.toggle('on', isOn);
-      sanityEnabled = isOn;
+      settings[name] = isOn;
     }
 
     function confirmPlay() {
-      document.getElementById('selection-overlay').classList.remove('active');
+      closeSelection();
+      alert('Starting game with settings:\n' + JSON.stringify(settings, null, 2));
+    }
 
-      window.sanityEnabled = sanityEnabled;
-
-      alert('Starting game with Sanity ' + (sanityEnabled ? 'ON' : 'OFF'));
-
+    function closeCredits() {
+      document.getElementById('credits-overlay').classList.remove('active');
     }
 
     function openLogs() {
@@ -442,20 +558,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      var toggle = document.getElementById('sanityToggle');
-      var status = document.getElementById('sanityStatus');
-      if (toggle.classList.contains('on')) {
-        status.textContent = 'ON';
-        status.classList.add('on');
-        sanityEnabled = true;
-      } else {
-        status.textContent = 'OFF';
-        status.classList.remove('on');
-        sanityEnabled = false;
-      }
+      ['sanity', 'vignette'].forEach(function(name) {
+        const toggle = document.getElementById(name + 'Toggle');
+        const status = document.getElementById(name + 'Status');
+        if (toggle.classList.contains('on')) {
+          status.textContent = 'ON';
+          status.classList.add('on');
+          settings[name] = true;
+        } else {
+          status.textContent = 'OFF';
+          status.classList.remove('on');
+          settings[name] = false;
+        }
+      });
     });
-
-    window.getSanityEnabled = function() { return sanityEnabled; };
   </script>
 
 </body>
