@@ -38,6 +38,10 @@
     </div>
     <div id="bodycamOverlay"><canvas id="bodycamCanvas"></canvas></div>
     <div id="schizoOverlay"></div>
+
+    <!-- ─── JOYSTICK CONTAINER (ADDED) ─── -->
+    <div id="joystickContainer"><div id="joystickKnob"></div></div>
+
     <div id="deathOverlay">
         <div id="deathRedOverlay"></div>
         <div id="deathWhiteFlash"></div>
@@ -52,7 +56,7 @@
         </div>
     </div>
 
-    <!-- ─── IMPORT MAP (MUST be before the module script) ─── -->
+    <!-- ─── IMPORT MAP ─── -->
     <script type="importmap">
     {
         "imports": {
@@ -62,7 +66,7 @@
     }
     </script>
 
-    <!-- ─── GAME SCRIPT (loaded as a module) ─── -->
+    <!-- ─── GAME SCRIPT (module) ─── -->
     <script type="module" src="game.js"></script>
 </body>
 </html>
