@@ -1759,6 +1759,18 @@ document.addEventListener('mousemove', (e) => {
     mouseSpeed = speed * 0.02;
 });
 
+// ─── TOGGLE POINTER LOCK WITH 'M' KEY ──────────────────────
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        if (document.pointerLockElement) {
+            document.exitPointerLock();
+        } else {
+            renderer.domElement.requestPointerLock().catch(() => {});
+        }
+    }
+});
+
 document.getElementById('winContinue').addEventListener('click', () => location.reload());
 
 document.getElementById('btnRespawn').addEventListener('click', () => respawn());
