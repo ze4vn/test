@@ -1,3 +1,11 @@
+// ─── READ URL PARAMETERS ────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get('mode') || 'desktop';
+const sanityParam = urlParams.get('sanity') || 'on';
+const isMobile = mode === 'mobile';
+const sanityOn = sanityParam === 'on';
+
+// ─── IMPORTS ──────────────────────────────────────────────
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -459,7 +467,7 @@ function restartLevels() {
 }
 
 function mainMenu() {
-    alert('Main Menu – coming soon!');
+    window.location.href = 'index.html';
 }
 
 // ─── MAZE GENERATOR ──────────────────────────────────────────
@@ -1801,14 +1809,167 @@ function checkNearbyLights() {
     return nearest < LIGHT_DETECTION_RADIUS;
 }
 
-// ─── START GAME (exported) ────────────────────────────────
-export function startGame(sanityOn) {
-    sanityEnabled = sanityOn;
+// ─── MOBILE CONTROLS ──────────────────────────────────────────
+let joystickActive = false;
+let joystickTouchId = null;
+let joystickDir = { x: 0, y: 0 };
+let joystickMagnitude = 0;
+let lookTouchId = null;
+let lastLookX = 0, lastLookY = 0;
+let tapStartTime = 0;
+let tapStartPos = { x: 0, y: 0 };
+let isTapPossible = false;
 
-    // ─── FIX #1: delay the initialisation ──
+const joystickContainer = document.getElementById('joystickContainer');
+const joystickKnob = document.getElementById('joystickKnob');
+const sanityContainer = document.getElementById('sanityContainer');
+
+if (isMobile) {
+    joystickContainer.style.display = 'block';
+    sanityContainer.classList.add('mobile-sanity');
+} else {
+    joystickContainer.style.display = 'none';
+    sanityContainer.classList.remove('mobile-sanity');
+}
+
+function handleTouchStart(e) {
+    if (isDead || isTransitioning) return;
+    e.preventDefault();
+    const touches = e.changedTouches;
+    for (const touch of touches) {
+        const rect = joystickContainer.getBoundingClientRect();
+        const touchX = touch.clientX;
+        const touchY = touch.clientY;
+
+        if (touchX >= rect.left && touchX <= rect.right &&
+            touchY >= rect.top && touchY <= rect.bottom) {
+            if (joystickTouchId === null) {
+                joystickTouchId = touch.identifier;
+                joystickActive = true;
+                updateJoystick(touch);
+            }
+        } else {
+            if (lookTouchId === null) {
+                lookTouchId = touch.identifier;
+                lastLookX = touch.clientX;
+                lastLookY = touch.clientY;
+                tapStartTime = performance.now();
+                tapStartPos.x = touch.clientX;
+                tapStartPos.y = touch.clientY;
+                isTapPossible = true;
+            }
+        }
+    }
+}
+
+function handleTouchMove(e) {
+    if (isDead || isTransitioning) return;
+    e.preventDefault();
+    const touches = e.changedTouches;
+    for (const touch of touches) {
+        if (touch.identifier === joystickTouchId) {
+            updateJoystick(touch);
+        }
+        if (touch.identifier === lookTouchId) {
+            const dx = touch.clientX - lastLookX;
+            const dy = touch.clientY - lastLookY;
+            const sens = 0.004;
+            yaw -= dx * sens;
+            pitch -= dy * sens;
+            pitch = Math.max(-Math.PI / 2 + 0.08, Math.min(Math.PI / 2 - 0.08, pitch));
+            camera.rotation.y = yaw;
+            camera.rotation.x = pitch;
+            lastLookX = touch.clientX;
+            lastLookY = touch.clientY;
+            smoothMoveX += dx * 0.0008;
+            smoothMoveY += dy * 0.0008;
+            smoothMoveX *= 0.92;
+            smoothMoveY *= 0.92;
+            headTilt = -dx * 2.5;
+            smoothHeadTilt += (headTilt - smoothHeadTilt) * 0.08;
+            mouseSpeed = Math.sqrt(dx*dx + dy*dy) * 0.02;
+            if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+                isTapPossible = false;
+            }
+        }
+    }
+}
+
+function handleTouchEnd(e) {
+    e.preventDefault();
+    const touches = e.changedTouches;
+    for (const touch of touches) {
+        if (touch.identifier === joystickTouchId) {
+            joystickTouchId = null;
+            joystickActive = false;
+            joystickDir.x = 0;
+            joystickDir.y = 0;
+            joystickMagnitude = 0;
+            joystickKnob.style.transform = 'translate(-50%, -50%)';
+        }
+        if (touch.identifier === lookTouchId) {
+            lookTouchId = null;
+            if (isTapPossible) {
+                const dt = performance.now() - tapStartTime;
+                const dist = Math.hypot(touch.clientX - tapStartPos.x, touch.clientY - tapStartPos.y);
+                if (dt < 200 && dist < 30) {
+                    if (!redModeActive) {
+                        flashlightOn = !flashlightOn;
+                        const hint = document.getElementById('flashlightHint');
+                        hint.textContent = flashlightOn ? 'click to toggle flashlight' : '🔦 flashlight off';
+                        hint.classList.add('visible');
+                        clearTimeout(window._hintTimeout);
+                        window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
+                    }
+                }
+            }
+            isTapPossible = false;
+        }
+    }
+}
+
+function updateJoystick(touch) {
+    const rect = joystickContainer.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const radius = rect.width / 2 - 25;
+    let dx = touch.clientX - cx;
+    let dy = touch.clientY - cy;
+    const dist = Math.hypot(dx, dy);
+    const maxDist = radius;
+    const clampedDist = Math.min(dist, maxDist);
+    const angle = Math.atan2(dy, dx);
+    const limitedDx = Math.cos(angle) * clampedDist;
+    const limitedDy = Math.sin(angle) * clampedDist;
+    joystickKnob.style.transform = `translate(${-25 + limitedDx}px, ${-25 + limitedDy}px)`;
+    const norm = clampedDist / maxDist;
+    joystickDir.x = limitedDx / maxDist;
+    joystickDir.y = -limitedDy / maxDist;
+    joystickMagnitude = norm;
+}
+
+if (isMobile) {
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+    document.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+    // For mobile, we lock the pointer immediately (the cursor is not used)
+    isLocked = true;
+}
+
+// ─── START GAME ──────────────────────────────────────────────
+function startGame() {
+    // Use the global sanityOn (from URL)
+    if (!sanityOn) {
+        // Sanity is disabled – we can bypass sanity drain
+        // (The game will handle it, but we keep the variable for logic)
+        // We'll still run the sanity functions but they'll be ignored.
+    }
+
+    // Delayed initialisation to let the container size settle
     setTimeout(() => {
         generateLevel(0);
-        // ─── FIX #2: start animation after a short delay ──
+        // Start the loop
         animate(performance.now());
     }, 100);
 }
@@ -1820,7 +1981,7 @@ let prevTime = performance.now();
 function animate(time) {
     if (stopped) return;
 
-    // ─── FIX #3: guard against zero-size container ──
+    // Guard against zero-size container (framebuffer errors)
     if (container.clientWidth === 0 || container.clientHeight === 0) {
         requestAnimationFrame(animate);
         return;
@@ -1855,30 +2016,37 @@ function animate(time) {
 
     // ── SANITY ──
     const isMoving = keys['W'] || keys['S'] || keys['A'] || keys['D'] ||
-        keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'];
+        keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] ||
+        (joystickActive && joystickMagnitude > 0.1);
+
     nearLightSource = checkNearbyLights();
 
     if (!isDead) {
-        if (flashlightOn) {
-            sanity = Math.max(0, sanity - SANITY_DRAIN_FLASHLIGHT * dt);
-            flashlightOffTime = 0;
-        } else {
-            if (nearLightSource) {
-                sanity = Math.min(100, sanity + SANITY_REGEN_NEAR_LIGHT * dt);
+        if (sanityOn) {
+            if (flashlightOn) {
+                sanity = Math.max(0, sanity - SANITY_DRAIN_FLASHLIGHT * dt);
                 flashlightOffTime = 0;
             } else {
-                flashlightOffTime += dt;
-                if (flashlightOffTime > 2.0) {
-                    sanity = Math.max(0, sanity - SANITY_DRAIN_DARKNESS * dt);
+                if (nearLightSource) {
+                    sanity = Math.min(100, sanity + SANITY_REGEN_NEAR_LIGHT * dt);
+                    flashlightOffTime = 0;
                 } else {
-                    sanity = Math.max(0, sanity - SANITY_DRAIN_DARKNESS * dt * 0.3);
+                    flashlightOffTime += dt;
+                    if (flashlightOffTime > 2.0) {
+                        sanity = Math.max(0, sanity - SANITY_DRAIN_DARKNESS * dt);
+                    } else {
+                        sanity = Math.max(0, sanity - SANITY_DRAIN_DARKNESS * dt * 0.3);
+                    }
                 }
             }
+        } else {
+            // Sanity disabled – keep it at 100
+            sanity = 100;
         }
 
         if (sanity <= 0) {
             sanity = 0;
-            if (!isDead) triggerDeath('sanity');
+            if (!isDead && sanityOn) triggerDeath('sanity');
         }
     }
 
@@ -1893,7 +2061,7 @@ function animate(time) {
     const sanityFactor = 1 - (sanity / 100);
     const schizoIntensity = Math.min(1, sanityFactor * 1.8);
 
-    if (isSchizo && !isDead) {
+    if (isSchizo && !isDead && sanityOn) {
         schizoTimer += dt;
         schizoOverlay.classList.add('active');
         if (sanity < 5) schizoOverlay.classList.add('intense');
@@ -2064,10 +2232,19 @@ function animate(time) {
         velocity.y += GRAVITY * dt;
 
         let moveX_ = 0, moveZ_ = 0;
+        // Keyboard input
         if (keys['W'] || keys['ArrowUp']) { moveX_ += forward.x; moveZ_ += forward.z; }
         if (keys['S'] || keys['ArrowDown']) { moveX_ -= forward.x; moveZ_ -= forward.z; }
         if (keys['A'] || keys['ArrowLeft']) { moveX_ -= strafe.x; moveZ_ -= strafe.z; }
         if (keys['D'] || keys['ArrowRight']) { moveX_ += strafe.x; moveZ_ += strafe.z; }
+
+        // Joystick input (mobile)
+        if (joystickActive && joystickMagnitude > 0.1) {
+            const jx = joystickDir.x;
+            const jy = joystickDir.y;
+            moveX_ += forward.x * jy + strafe.x * jx;
+            moveZ_ += forward.z * jy + strafe.z * jx;
+        }
 
         const inputLen = Math.sqrt(moveX_ * moveX_ + moveZ_ * moveZ_);
         let desiredDir = new THREE.Vector3(moveX_, 0, moveZ_);
@@ -2089,7 +2266,8 @@ function animate(time) {
             }
         } else {
             if (inputLen > 0) {
-                if (keys['A'] || keys['ArrowLeft'] || keys['D'] || keys['ArrowRight']) {
+                if (keys['A'] || keys['ArrowLeft'] || keys['D'] || keys['ArrowRight'] ||
+                    (joystickActive && Math.abs(joystickDir.x) > 0.1)) {
                     const addSpeed = AIR_ACCEL * dt;
                     velocity.x += desiredDir.x * addSpeed;
                     velocity.z += desiredDir.z * addSpeed;
@@ -2133,13 +2311,11 @@ function animate(time) {
     requestAnimationFrame(animate);
 }
 
-// ─── INITIAL POINTER LOCK ATTEMPT ────────────────────────────
-setTimeout(() => {
-    if (!isLocked && !stopped) {
-        try { renderer.domElement.requestPointerLock(); } catch (err) {}
-    }
-}, 600);
+// ─── INIT ──────────────────────────────────────────────────
+// Start the game
+startGame();
 
+// Cleanup on page unload
 window.addEventListener('beforeunload', () => {
     stopped = true;
     renderer.dispose();
