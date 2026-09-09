@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>The Maze V </title>
+    <title>The Maze V – Menu</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='white'>V</text></svg>" />
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+    <!-- Device Selection -->
     <div id="menu">
         <h1>The Maze V</h1>
-        <h4>[??% Done]</h4>
+        <h4>[10,5% Done]</h4>
         <div class="sub">Select Your Device.</div>
         <div class="btn-group">
             <button class="btn" id="btnMobile">Mobile</button>
@@ -19,6 +20,7 @@
         </div>
     </div>
 
+    <!-- Credits (full-screen initial) -->
     <div id="credits">
         <p id="madeby">Made By</p>
         <div id="devs-wrapper">
@@ -29,10 +31,9 @@
         </div>
     </div>
 
+    <!-- Main Menu after device selection -->
     <div id="main-menu-after">
-        <div id="top-bar">
-            <span id="title-top">The Maze V</span>
-        </div>
+        <div id="top-bar"><span id="title-top">The Maze V</span></div>
         <div id="menu-buttons">
             <button class="menu-btn" id="playBtn">Play</button>
             <button class="menu-btn" id="settingsBtn">Settings</button>
@@ -43,6 +44,7 @@
         <div id="logs-btn">Logs</div>
     </div>
 
+    <!-- Settings Overlay -->
     <div id="selection-overlay">
         <div class="sel-title">Settings</div>
         <button class="sel-btn sel-exit" id="selExit">← Exit</button>
@@ -58,6 +60,7 @@
         </div>
     </div>
 
+    <!-- Credits Overlay (scroll) -->
     <div id="credits-overlay">
         <div id="credits-bg"></div>
         <button id="credits-exit">← Exit</button>
@@ -73,12 +76,10 @@
         </div>
     </div>
 
+    <!-- Logs Overlay -->
     <div id="logs-overlay">
         <div id="logs-box">
-            <div id="logs-header">
-                <span>Logs</span>
-                <button id="logs-exit">✕</button>
-            </div>
+            <div id="logs-header"><span>Logs</span><button id="logs-exit">✕</button></div>
             <div id="logs-content">
                 <p id="logs-version">0.0.1</p>
                 <p id="logs-date">Monday 7th September</p>
@@ -88,6 +89,7 @@
         </div>
     </div>
 
+    <!-- ─── SCRIPT (plain JS, NOT module) ─── -->
     <script src="script.js"></script>
 </body>
 </html>
