@@ -132,13 +132,12 @@ sanityToggle.addEventListener('click', (e) => {
 });
 
 // ============================================================
-//  GAME ENGINE – FIXED for framebuffer errors
+//  GAME ENGINE
 // ============================================================
 export function startGame(sanityOn) {
   sanityEnabled = sanityOn;
   gameContainer.classList.add('active');
 
-  // Wait for layout to settle – prevents framebuffer zero-size errors
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       initGame(sanityOn);
@@ -149,14 +148,13 @@ export function startGame(sanityOn) {
 function initGame(sanityOn) {
   const container = threeContainer;
 
-  // Safety check – if container still has no size, force a resize
   if (container.clientWidth === 0 || container.clientHeight === 0) {
     container.style.width = '100%';
     container.style.height = '100%';
-    void container.offsetWidth; // force reflow
+    void container.offsetWidth;
   }
 
-  // ---- Scene setup ----
+  // ---- Scene ----
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x040406);
   scene.fog = new THREE.FogExp2(0x040406, 0.012);
@@ -179,11 +177,10 @@ function initGame(sanityOn) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   container.appendChild(renderer.domElement);
 
-  // ---- Resize guard ----
   const resize = () => {
     const w = container.clientWidth;
     const h = container.clientHeight;
-    if (w === 0 || h === 0) return; // critical guard
+    if (w === 0 || h === 0) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
@@ -1645,6 +1642,7 @@ function initGame(sanityOn) {
   // ---- Misc game functions ----
   function getTerrainHeight(worldX, worldZ) { return 0; }
 
+  // ---- THIS IS THE MISSING FUNCTION ----
   function generateLevel(level) {
     if (mazeGroup) { scene.remove(mazeGroup); mazeGroup = null; }
     deactivateRedMode();
