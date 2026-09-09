@@ -1164,8 +1164,17 @@ cameraGroup.add(camera);
 cameraGroup.position.set(0, 1.55, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+// ─── Mobile performance: lower pixel ratio, smaller shadows ──
+if (isMobile) {
+    renderer.setPixelRatio(1);
+    renderer.shadowMap.mapSize.width = 1024;
+    renderer.shadowMap.mapSize.height = 1024;
+    // Reduce bloom strength
+    bloomStrength = 0.15;
+} else {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+}
 renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1491,9 +1500,10 @@ const realismShader = {
 const realismPass = new ShaderPass(realismShader);
 composer.addPass(realismPass);
 
+let bloomStrength = 0.25;
 const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(container.clientWidth, container.clientHeight),
-    0.25, 0.15, 0.08
+    bloomStrength, 0.15, 0.08
 );
 composer.addPass(bloomPass);
 const outputPass = new OutputPass();
@@ -1723,7 +1733,6 @@ renderer.domElement.addEventListener('click', () => {
             window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
         }
     } else if (!isTransitioning && !isDead) {
-        // Request pointer lock and silently catch any rejection
         renderer.domElement.requestPointerLock().catch(() => {});
     }
 });
@@ -2000,13 +2009,11 @@ if (isMobile) {
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd, { passive: false });
     document.addEventListener('touchcancel', handleTouchEnd, { passive: false });
-    // For mobile, we lock the pointer immediately (the cursor is not used)
     isLocked = true;
 }
 
 // ─── START GAME ──────────────────────────────────────────────
 function startGame() {
-    // Delayed initialisation to let the container size settle
     setTimeout(() => {
         generateLevel(0);
         animate(performance.now());
@@ -2021,7 +2028,6 @@ let isMoving = false;
 function animate(time) {
     if (stopped) return;
 
-    // Guard against zero-size container (framebuffer errors)
     if (container.clientWidth === 0 || container.clientHeight === 0) {
         requestAnimationFrame(animate);
         return;
@@ -2030,13 +2036,11 @@ function animate(time) {
     const dt = Math.min((time - prevTime) / 1000, 0.05);
     prevTime = time;
 
-    // ── Bodycam animation ──
     if (bodycamActive) {
         bodycamTime += dt * 1000;
         drawBodycam(bodycamTime);
     }
 
-    // ── Timer ──
     if (!isDead && gameRunning) {
         gameTime -= dt;
         if (gameTime < 0) gameTime = 0;
@@ -2054,7 +2058,6 @@ function animate(time) {
     frameCount++;
     if (time - lastFpsUpdate >= 1000) { currentFps = frameCount; frameCount = 0; lastFpsUpdate = time; }
 
-    // ── SANITY ──
     isMoving = keys['W'] || keys['S'] || keys['A'] || keys['D'] ||
         keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] ||
         (joystickActive && joystickMagnitude > 0.1);
@@ -2080,7 +2083,6 @@ function animate(time) {
                 }
             }
         } else {
-            // Sanity disabled – keep it at 100
             sanity = 100;
         }
 
@@ -2096,7 +2098,6 @@ function animate(time) {
 
     const fightOrFlightActive = sanity < 30 && !isDead;
 
-    // ── SCHIZOPHRENIA EFFECTS ──
     const schizoOverlay = document.getElementById('schizoOverlay');
     const sanityFactor = 1 - (sanity / 100);
     const schizoIntensity = Math.min(1, sanityFactor * 1.8);
@@ -2153,10 +2154,8 @@ function animate(time) {
         }
     }
 
-    // ── MAZE SHIFTING ──
     updateMazeShifting(time, dt);
 
-    // ── Stamina ──
     const canSprint = isSprinting && isMoving && onGround && stamina > 0 && !isDead;
     if (canSprint) {
         stamina = Math.max(0, stamina - STAMINA_DRAIN * dt * (fightOrFlightActive ? 0.8 : 1.0));
@@ -2175,13 +2174,11 @@ function animate(time) {
         realismPass.uniforms.staminaVignette.value = current + (targetStaminaVig - current) * 0.03;
     }
 
-    // ── Movement speed ──
     const sprintActive = canSprint && stamina > 0;
     let baseSpeed = fightOrFlightActive ? FIGHT_FLIGHT_MOVE_SPEED : BASE_MOVE_SPEED;
     let sprintSpeed = fightOrFlightActive ? FIGHT_FLIGHT_SPRINT_SPEED : SPRINT_MOVE_SPEED;
     const currentMoveSpeed = sprintActive ? sprintSpeed : baseSpeed;
 
-    // ── FOV ──
     const targetFov = sprintActive ? 92 : (fightOrFlightActive ? 88 : 84);
     if (!isDead) {
         camera.fov += (targetFov - camera.fov) * 0.04;
@@ -2194,14 +2191,12 @@ function animate(time) {
         realismPass.uniforms.fovScale.value = cur + (targetFovScale - cur) * 0.04;
     }
 
-    // ── Flashlight flicker ──
     flickerTimer += dt;
     if (flickerTimer >= flickerInterval && !isFlickering) {
         isFlickering = true;
         flickerPhase = 0;
     }
 
-    // ── Bodycam movement ──
     const speed = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
     const moveX = smoothMoveX + velocity.x * 0.012;
     const moveY = smoothMoveY + velocity.z * 0.012;
@@ -2215,7 +2210,6 @@ function animate(time) {
         realismPass.uniforms.bodycamScanline.value = redModeActive ? 0.6 + 0.4 * Math.sin(time * 0.0015) : 0;
     }
 
-    // ── Breathing & bob ──
     const breathSpeedMult = sprintActive ? 1.9 : (fightOrFlightActive ? 1.4 : 1.0);
     if (!isDead) breathPhase += dt * BREATH_SPEED * breathSpeedMult;
     const breath = Math.sin(breathPhase * Math.PI * 2);
@@ -2244,10 +2238,8 @@ function animate(time) {
     smoothHeadTilt += (headTilt - smoothHeadTilt) * 0.06;
     updateFlashlight();
 
-    // ── Check teleporter ──
     if (!isTransitioning && gameRunning && isLocked) checkTeleporter();
 
-    // ── Player movement ──
     if (!isTransitioning && gameRunning && isLocked && !isDead) {
         const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
         const strafe = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
@@ -2271,13 +2263,11 @@ function animate(time) {
         velocity.y += GRAVITY * dt;
 
         let moveX_ = 0, moveZ_ = 0;
-        // Keyboard input
         if (keys['W'] || keys['ArrowUp']) { moveX_ += forward.x; moveZ_ += forward.z; }
         if (keys['S'] || keys['ArrowDown']) { moveX_ -= forward.x; moveZ_ -= forward.z; }
         if (keys['A'] || keys['ArrowLeft']) { moveX_ -= strafe.x; moveZ_ -= strafe.z; }
         if (keys['D'] || keys['ArrowRight']) { moveX_ += strafe.x; moveZ_ += strafe.z; }
 
-        // Joystick input (mobile)
         if (joystickActive && joystickMagnitude > 0.1) {
             const jx = joystickDir.x;
             const jy = joystickDir.y;
@@ -2350,10 +2340,8 @@ function animate(time) {
     requestAnimationFrame(animate);
 }
 
-// ─── INIT ──────────────────────────────────────────────────
 startGame();
 
-// Cleanup on page unload
 window.addEventListener('beforeunload', () => {
     stopped = true;
     renderer.dispose();
