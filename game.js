@@ -66,6 +66,7 @@ function formatTime(seconds) {
 
 function updateTimerUI() {
     const el = document.getElementById('timerContainer');
+    if (!el) return;
     el.textContent = formatTime(gameTime);
     el.classList.remove('low-time', 'critical-time');
     if (gameTime <= 0) el.classList.add('critical-time');
@@ -74,12 +75,13 @@ function updateTimerUI() {
 
 // ─── BODYCAM OVERLAY ────────────────────────────────────────
 const bodycamCanvas = document.getElementById('bodycamCanvas');
-const bodycamCtx = bodycamCanvas.getContext('2d');
+const bodycamCtx = bodycamCanvas ? bodycamCanvas.getContext('2d') : null;
 const bodycamOverlay = document.getElementById('bodycamOverlay');
 let bodycamActive = false;
 let bodycamTime = 0;
 
 function resizeBodycam() {
+    if (!bodycamCanvas) return;
     bodycamCanvas.width = window.innerWidth;
     bodycamCanvas.height = window.innerHeight;
 }
@@ -87,6 +89,7 @@ window.addEventListener('resize', resizeBodycam);
 resizeBodycam();
 
 function drawBodycam(time) {
+    if (!bodycamCanvas || !bodycamCtx) return;
     const w = bodycamCanvas.width, h = bodycamCanvas.height;
     const ctx = bodycamCtx;
     ctx.clearRect(0, 0, w, h);
@@ -211,11 +214,11 @@ function drawBodycam(time) {
 
 function startBodycam() {
     bodycamActive = true;
-    bodycamOverlay.classList.add('active');
+    if (bodycamOverlay) bodycamOverlay.classList.add('active');
 }
 function stopBodycam() {
     bodycamActive = false;
-    bodycamOverlay.classList.remove('active');
+    if (bodycamOverlay) bodycamOverlay.classList.remove('active');
 }
 
 // ─── RED MODE ────────────────────────────────────────────────
@@ -291,11 +294,13 @@ function activateRedMode() {
     startBodycam();
 
     const schizo = document.getElementById('schizoOverlay');
-    schizo.classList.add('active');
+    if (schizo) schizo.classList.add('active');
 
     const hint = document.getElementById('flashlightHint');
-    hint.textContent = '';
-    hint.classList.remove('visible');
+    if (hint) {
+        hint.textContent = '';
+        hint.classList.remove('visible');
+    }
     clearTimeout(window._redHintTimeout);
 }
 
@@ -306,7 +311,7 @@ function deactivateRedMode() {
 
     stopBodycam();
     const schizo = document.getElementById('schizoOverlay');
-    schizo.classList.remove('active');
+    if (schizo) schizo.classList.remove('active');
 
     for (const src of lightSources) {
         if (src.light && src.light.isPointLight) {
@@ -353,8 +358,10 @@ function deactivateRedMode() {
     }
 
     const hint = document.getElementById('flashlightHint');
-    hint.textContent = 'click to toggle flashlight';
-    hint.classList.remove('visible');
+    if (hint) {
+        hint.textContent = 'click to toggle flashlight';
+        hint.classList.remove('visible');
+    }
 }
 
 // ─── LEVEL TITLE ─────────────────────────────────────────────
@@ -362,6 +369,7 @@ function showLevelTitle(levelNum, title, subtitle) {
     const container = document.getElementById('levelTitleContainer');
     const mainEl = document.getElementById('levelTitleMain');
     const subEl = document.getElementById('levelTitleSub');
+    if (!container || !mainEl || !subEl) return;
 
     mainEl.textContent = `Level ${levelNum}`;
     subEl.textContent = subtitle || '';
@@ -390,26 +398,31 @@ function triggerDeath(cause) {
     const content = document.getElementById('deathContent');
     const titleEl = document.getElementById('deathTitle');
     const subEl = document.getElementById('deathSub');
+    if (!deathOverlay) return;
 
     if (deathCause === 'time') {
-        titleEl.textContent = 'Time\'s Up.';
-        subEl.textContent = 'You ran out of time.';
+        if (titleEl) titleEl.textContent = 'Time\'s Up.';
+        if (subEl) subEl.textContent = 'You ran out of time.';
     } else {
-        titleEl.textContent = 'You Have Died.';
-        subEl.textContent = 'Your sanity crumbled.';
+        if (titleEl) titleEl.textContent = 'You Have Died.';
+        if (subEl) subEl.textContent = 'Your sanity crumbled.';
     }
 
     deathOverlay.classList.add('active');
-    setTimeout(() => redOverlay.classList.add('show'), 50);
+    if (redOverlay) {
+        setTimeout(() => redOverlay.classList.add('show'), 50);
+    }
 
-    if (!redModeActive) {
+    if (!redModeActive && whiteFlash) {
         setTimeout(() => {
             whiteFlash.classList.add('flash');
             setTimeout(() => whiteFlash.classList.remove('flash'), 150);
         }, 400);
     }
 
-    setTimeout(() => content.classList.add('show'), 800);
+    if (content) {
+        setTimeout(() => content.classList.add('show'), 800);
+    }
 }
 
 function respawn() {
@@ -419,9 +432,9 @@ function respawn() {
     const deathOverlay = document.getElementById('deathOverlay');
     const redOverlay = document.getElementById('deathRedOverlay');
     const content = document.getElementById('deathContent');
-    deathOverlay.classList.remove('active');
-    redOverlay.classList.remove('show');
-    content.classList.remove('show');
+    if (deathOverlay) deathOverlay.classList.remove('active');
+    if (redOverlay) redOverlay.classList.remove('show');
+    if (content) content.classList.remove('show');
 
     deactivateRedMode();
     redModeActivated = false;
@@ -441,7 +454,6 @@ function respawn() {
     isSchizo = false;
     schizoTimer = 0;
     isLocked = true;
-    // Request lock only when the user clicks – handled by click handler
 }
 
 function restartLevels() {
@@ -457,12 +469,13 @@ function restartLevels() {
     const deathOverlay = document.getElementById('deathOverlay');
     const redOverlay = document.getElementById('deathRedOverlay');
     const content = document.getElementById('deathContent');
-    deathOverlay.classList.remove('active');
-    redOverlay.classList.remove('show');
-    content.classList.remove('show');
+    if (deathOverlay) deathOverlay.classList.remove('active');
+    if (redOverlay) redOverlay.classList.remove('show');
+    if (content) content.classList.remove('show');
     isLocked = true;
     updateTimerUI();
-    document.getElementById('levelTitleContainer').classList.remove('visible');
+    const container = document.getElementById('levelTitleContainer');
+    if (container) container.classList.remove('visible');
 }
 
 function mainMenu() {
@@ -1576,13 +1589,13 @@ let frameCount = 0, lastFpsUpdate = performance.now(), currentFps = 0;
 document.addEventListener('keydown', (e) => {
     if (e.key === 'i' || e.key === 'I') {
         showInfo = !showInfo;
-        infoPanel.style.display = showInfo ? 'block' : 'none';
+        if (infoPanel) infoPanel.style.display = showInfo ? 'block' : 'none';
         e.preventDefault();
     }
 });
 
 function updateInfo() {
-    if (!showInfo) return;
+    if (!showInfo || !infoContent) return;
     const pos = cameraGroup.position;
     const distToExit = Math.sqrt((pos.x - teleporterPos.x) ** 2 + (pos.z - teleporterPos.z) ** 2);
     const yawDeg = ((yaw * 180 / Math.PI) % 360).toFixed(1);
@@ -1602,6 +1615,7 @@ function updateSanityUI() {
     const level = getSanityLevel(sanity);
     const letterEl = document.getElementById('sanityLetter');
     const circleEl = document.getElementById('sanityCircle');
+    if (!letterEl || !circleEl) return;
     letterEl.textContent = level;
     letterEl.className = '';
     if (sanity < 10) {
@@ -1702,10 +1716,12 @@ renderer.domElement.addEventListener('click', () => {
     if (isLocked) {
         flashlightOn = !flashlightOn;
         const hint = document.getElementById('flashlightHint');
-        hint.textContent = flashlightOn ? 'click to toggle flashlight' : '🔦 flashlight off';
-        hint.classList.add('visible');
-        clearTimeout(window._hintTimeout);
-        window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
+        if (hint) {
+            hint.textContent = flashlightOn ? 'click to toggle flashlight' : '🔦 flashlight off';
+            hint.classList.add('visible');
+            clearTimeout(window._hintTimeout);
+            window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
+        }
     } else if (!isTransitioning && !isDead) {
         // Request pointer lock and silently catch any rejection
         renderer.domElement.requestPointerLock().catch(() => {});
@@ -1715,11 +1731,12 @@ renderer.domElement.addEventListener('click', () => {
 document.addEventListener('pointerlockchange', () => {
     isLocked = document.pointerLockElement === renderer.domElement;
     if (isLocked) {
-        document.getElementById('flashlightHint').classList.add('visible');
-        clearTimeout(window._hintTimeout);
-        window._hintTimeout = setTimeout(() => {
-            document.getElementById('flashlightHint').classList.remove('visible');
-        }, 3000);
+        const hint = document.getElementById('flashlightHint');
+        if (hint) {
+            hint.classList.add('visible');
+            clearTimeout(window._hintTimeout);
+            window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 3000);
+        }
     }
 });
 
@@ -1753,9 +1770,9 @@ async function transitionToNextLevel() {
     isTransitioning = true;
     const white = document.getElementById('whiteFlash');
     if (!redModeActive) {
-        white.style.opacity = '1';
+        if (white) white.style.opacity = '1';
         await sleep(250);
-        white.style.opacity = '0';
+        if (white) white.style.opacity = '0';
     } else {
         await sleep(150);
     }
@@ -1779,7 +1796,10 @@ function checkTeleporter() {
     const dist = Math.sqrt((px - teleporterPos.x) ** 2 + (pz - teleporterPos.z) ** 2);
     if (dist < 1.0) {
         if (currentLevel === 0) transitionToNextLevel();
-        else if (currentLevel === 1) document.getElementById('winOverlay').classList.add('active');
+        else if (currentLevel === 1) {
+            const win = document.getElementById('winOverlay');
+            if (win) win.classList.add('active');
+        }
     }
 }
 
@@ -1788,6 +1808,7 @@ const staminaContainer = document.getElementById('staminaContainer');
 const staminaBar = document.getElementById('staminaBar');
 
 function updateStaminaUI() {
+    if (!staminaBar) return;
     const pct = Math.max(0, Math.min(100, (stamina / MAX_STAMINA) * 100));
     staminaBar.style.width = pct + '%';
     staminaBar.classList.toggle('low', pct < 25);
@@ -1795,6 +1816,9 @@ function updateStaminaUI() {
         staminaBar.classList.add('fight-or-flight');
     } else {
         staminaBar.classList.remove('fight-or-flight');
+    }
+    if (staminaContainer) {
+        staminaContainer.style.opacity = (isSprinting && isMoving && onGround) ? '0.9' : '0';
     }
 }
 
@@ -1825,12 +1849,20 @@ const joystickContainer = document.getElementById('joystickContainer');
 const joystickKnob = document.getElementById('joystickKnob');
 const sanityContainer = document.getElementById('sanityContainer');
 
-if (isMobile) {
-    joystickContainer.style.display = 'block';
-    sanityContainer.classList.add('mobile-sanity');
-} else {
-    joystickContainer.style.display = 'none';
-    sanityContainer.classList.remove('mobile-sanity');
+// ─── SAFE JOYSTICK & SANITY CONTAINER SETUP ──────────────
+if (joystickContainer) {
+    if (isMobile) {
+        joystickContainer.style.display = 'block';
+    } else {
+        joystickContainer.style.display = 'none';
+    }
+}
+if (sanityContainer) {
+    if (isMobile) {
+        sanityContainer.classList.add('mobile-sanity');
+    } else {
+        sanityContainer.classList.remove('mobile-sanity');
+    }
 }
 
 function handleTouchStart(e) {
@@ -1838,6 +1870,7 @@ function handleTouchStart(e) {
     e.preventDefault();
     const touches = e.changedTouches;
     for (const touch of touches) {
+        if (!joystickContainer) continue;
         const rect = joystickContainer.getBoundingClientRect();
         const touchX = touch.clientX;
         const touchY = touch.clientY;
@@ -1906,7 +1939,7 @@ function handleTouchEnd(e) {
             joystickDir.x = 0;
             joystickDir.y = 0;
             joystickMagnitude = 0;
-            joystickKnob.style.transform = 'translate(-50%, -50%)';
+            if (joystickKnob) joystickKnob.style.transform = 'translate(-50%, -50%)';
         }
         if (touch.identifier === lookTouchId) {
             lookTouchId = null;
@@ -1917,10 +1950,12 @@ function handleTouchEnd(e) {
                     if (!redModeActive) {
                         flashlightOn = !flashlightOn;
                         const hint = document.getElementById('flashlightHint');
-                        hint.textContent = flashlightOn ? 'click to toggle flashlight' : '🔦 flashlight off';
-                        hint.classList.add('visible');
-                        clearTimeout(window._hintTimeout);
-                        window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
+                        if (hint) {
+                            hint.textContent = flashlightOn ? 'click to toggle flashlight' : '🔦 flashlight off';
+                            hint.classList.add('visible');
+                            clearTimeout(window._hintTimeout);
+                            window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
+                        }
                     }
                 }
             }
@@ -1930,6 +1965,7 @@ function handleTouchEnd(e) {
 }
 
 function updateJoystick(touch) {
+    if (!joystickContainer) return;
     const rect = joystickContainer.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -1942,7 +1978,9 @@ function updateJoystick(touch) {
     const angle = Math.atan2(dy, dx);
     const limitedDx = Math.cos(angle) * clampedDist;
     const limitedDy = Math.sin(angle) * clampedDist;
-    joystickKnob.style.transform = `translate(${-25 + limitedDx}px, ${-25 + limitedDy}px)`;
+    if (joystickKnob) {
+        joystickKnob.style.transform = `translate(${-25 + limitedDx}px, ${-25 + limitedDy}px)`;
+    }
     const norm = clampedDist / maxDist;
     joystickDir.x = limitedDx / maxDist;
     joystickDir.y = -limitedDy / maxDist;
@@ -1960,15 +1998,9 @@ if (isMobile) {
 
 // ─── START GAME ──────────────────────────────────────────────
 function startGame() {
-    // Use the global sanityOn (from URL)
-    if (!sanityOn) {
-        // Sanity disabled – keep it at 100 (the game will skip drain)
-    }
-
     // Delayed initialisation to let the container size settle
     setTimeout(() => {
         generateLevel(0);
-        // Start the loop
         animate(performance.now());
     }, 100);
 }
@@ -1976,6 +2008,7 @@ function startGame() {
 // ─── ANIMATION LOOP ──────────────────────────────────────────
 let stopped = false;
 let prevTime = performance.now();
+let isMoving = false;
 
 function animate(time) {
     if (stopped) return;
@@ -2014,7 +2047,7 @@ function animate(time) {
     if (time - lastFpsUpdate >= 1000) { currentFps = frameCount; frameCount = 0; lastFpsUpdate = time; }
 
     // ── SANITY ──
-    const isMoving = keys['W'] || keys['S'] || keys['A'] || keys['D'] ||
+    isMoving = keys['W'] || keys['S'] || keys['A'] || keys['D'] ||
         keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] ||
         (joystickActive && joystickMagnitude > 0.1);
 
@@ -2062,9 +2095,9 @@ function animate(time) {
 
     if (isSchizo && !isDead && sanityOn) {
         schizoTimer += dt;
-        schizoOverlay.classList.add('active');
-        if (sanity < 5) schizoOverlay.classList.add('intense');
-        else schizoOverlay.classList.remove('intense');
+        if (schizoOverlay) schizoOverlay.classList.add('active');
+        if (sanity < 5 && schizoOverlay) schizoOverlay.classList.add('intense');
+        else if (schizoOverlay) schizoOverlay.classList.remove('intense');
 
         if (realismPass.uniforms) {
             const glitch = 0.15 + 0.65 * schizoIntensity * (0.5 + 0.5 * Math.sin(time * 0.004 + schizoTimer));
@@ -2092,7 +2125,7 @@ function animate(time) {
         }
 
     } else {
-        if (!redModeActive) {
+        if (!redModeActive && schizoOverlay) {
             schizoOverlay.classList.remove('active', 'intense');
         }
         if (realismPass.uniforms) {
@@ -2126,7 +2159,6 @@ function animate(time) {
         stamina = Math.min(MAX_STAMINA, stamina + STAMINA_REGEN * dt * (fightOrFlightActive ? 1.1 : 1.0));
     }
     updateStaminaUI();
-    staminaContainer.style.opacity = (isSprinting && isMoving && onGround) ? '0.9' : '0';
 
     const staminaPct = stamina / MAX_STAMINA;
     if (realismPass.uniforms) {
@@ -2311,7 +2343,6 @@ function animate(time) {
 }
 
 // ─── INIT ──────────────────────────────────────────────────
-// Start the game
 startGame();
 
 // Cleanup on page unload
