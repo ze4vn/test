@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TheMaze5</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="game.css" />
 </head>
 <body>
+    <!-- ─── All the game DOM elements ─── -->
     <div id="gameOverlay">
         <div class="gameBg"></div>
         <div class="gameContent">
@@ -42,7 +43,7 @@
         <div id="deathWhiteFlash"></div>
         <div id="deathContent">
             <h1 id="deathTitle">You Have Died.</h1>
-            <div class="death-sub" id="deathSub">Your time has run out</div>
+            <div class="death-sub" id="deathSub">Your time has run out.</div>
             <div id="deathButtons">
                 <button id="btnRespawn">Respawn</button>
                 <button id="btnMainMenu">Main Menu</button>
@@ -51,14 +52,17 @@
         </div>
     </div>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-<script type="module" src="game.js"></script>
+    <!-- ─── IMPORT MAP (MUST be before the module script) ─── -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- ─── GAME SCRIPT (loaded as a module) ─── -->
+    <script type="module" src="game.js"></script>
 </body>
 </html>
