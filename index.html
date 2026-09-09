@@ -1,144 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>The Maze V</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='white'>V</text></svg>" />
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>The Maze V</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='white'>V</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  
-    <div id="menu">
-        <h1>The Maze V</h1>
-        <h4>[10,5% Done]</h4>
-        <div class="sub">Select Your Device.</div>
-        <div class="btn-group">
-            <button class="btn" id="btnMobile">Mobile</button>
-            <button class="btn" id="btnComputer">Computer</button>
+
+  <div id="menu">
+    <h1>The Maze V</h1>
+    <h4>[11% Done]</h4>
+    <div class="sub">Select Your Device.</div>
+    <div class="btn-group">
+      <button class="btn" id="btnMobile">Mobile</button>
+      <button class="btn" id="btnComputer">Computer</button>
+    </div>
+  </div>
+
+  <div id="credits">
+    <p id="madeby">Made By</p>
+    <div id="devs-wrapper">
+      <p id="fortyfourdevs">44devs</p>
+      <svg id="underline-svg" viewBox="0 0 300 30" preserveAspectRatio="none">
+        <path id="underline-path" d="M 0,15 Q 150,0 300,15" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+      </svg>
+    </div>
+  </div>
+
+  <div id="main-menu-after">
+    <div id="top-bar">
+      <span id="title-top">The Maze V</span>
+    </div>
+    <div id="menu-buttons">
+      <button class="menu-btn" id="playBtn">Play</button>
+      <button class="menu-btn" id="settingsBtn">Settings</button>
+      <button class="menu-btn" id="creditsBtn">Credits</button>
+      <button class="menu-btn" id="exitBtn">Exit</button>
+    </div>
+    <div id="bottom-left">By 44devs</div>
+    <div id="logs-btn">Logs</div>
+  </div>
+
+  <div id="selection-overlay">
+    <div class="sel-title">Selection</div>
+    <button class="sel-btn sel-exit" id="selExit">← Exit</button>
+    <button class="sel-btn sel-play" id="selPlay">Play →</button>
+    <div class="sel-settings">
+      <div class="sel-setting-row">
+        <span class="label">Sanity Mode</span>
+        <div class="toggle-switch on" id="sanityToggle">
+          <div class="toggle-knob"></div>
         </div>
+        <span class="status on" id="sanityStatus">ON</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="credits-overlay">
+    <div id="credits-bg"></div>
+    <button id="credits-exit">← Exit</button>
+    <div id="credits-title">Credits</div>
+    <div id="credits-scroll">
+      <div id="credits-content">
+        <p style="font-size:clamp(2rem,5vw,3.5rem); margin-bottom:6vh;">~ Developers ~</p>
+        <p style="font-size:clamp(3.5rem,8vw,6rem); font-weight:700; letter-spacing:12px; color:#fff;">44devs</p>
+        <p style="margin-top:8vh; font-size:clamp(1.2rem,2.5vw,2rem); color:#aaa;">~ Artists ~</p>
+        <p style="font-size:clamp(2rem,4vw,3rem); color:#ddd; letter-spacing:4px;">Susanna Delelis</p>
+        <p style="margin-top:10vh; font-size:clamp(0.8rem,1.5vw,1.2rem); color:#666;">Thank you for playing</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="logs-overlay">
+    <div id="logs-box">
+      <div id="logs-header">
+        <span>Logs</span>
+        <button id="logs-exit">✕</button>
+      </div>
+      <div id="logs-content">
+        <p id="logs-version">0.0.1</p>
+        <p id="logs-date">Monday 7th September</p>
+        <p id="logs-version">0.0.2</p>
+        <p id="logs-date">Wednesday 9th September</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameContainer" style="display:none; position:fixed; inset:0; z-index:9999; background:#000;">
+    <div id="threeContainer" style="width:100%; height:100%;"></div>
+    <div id="winOverlay">
+      <div class="winText">You Escaped.</div>
+      <div class="winSub" id="winContinue">Click to replay</div>
+    </div>
+    <div id="whiteFlash"></div>
+    <div id="blackFade"></div>
+    <div id="levelMsg"></div>
+    <div id="infoPanel"><div id="infoContent"></div></div>
+    <div id="timerContainer">5:0:0</div>
+    <div id="levelTitleContainer">
+      <div class="level-title-main" id="levelTitleMain">Level 1</div>
+      <div class="level-title-sub" id="levelTitleSub">The Woodland</div>
+    </div>
+    <div id="flashlightHint">click to toggle flashlight</div>
+    <div id="staminaContainer"><div id="staminaBar"></div></div>
+    <div id="sanityContainer">
+      <div id="sanityCircle">
+        <div id="sanityLetter">A</div>
+        <div id="sanityLabel">Sanity</div>
+      </div>
+    </div>
+    <div id="bodycamOverlay"><canvas id="bodycamCanvas"></canvas></div>
+    <div id="schizoOverlay"></div>
+
+    <div id="joystickContainer">
+      <div id="joystickKnob"></div>
     </div>
 
-    <div id="credits">
-        <p id="madeby">Made By</p>
-        <div id="devs-wrapper">
-            <p id="fortyfourdevs">44devs</p>
-            <svg id="underline-svg" viewBox="0 0 300 30" preserveAspectRatio="none">
-                <path id="underline-path" d="M 0,15 Q 150,0 300,15" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" />
-            </svg>
+    <div id="deathOverlay">
+      <div id="deathRedOverlay"></div>
+      <div id="deathWhiteFlash"></div>
+      <div id="deathContent">
+        <h1 id="deathTitle">You Have Died.</h1>
+        <div class="death-sub" id="deathSub">Your time has run out.</div>
+        <div id="deathButtons">
+          <button id="btnRespawn">Respawn</button>
+          <button id="btnMainMenu">Main Menu</button>
+          <button id="btnRestartLevels">Restart Levels</button>
         </div>
+      </div>
     </div>
+  </div>
 
-    <div id="main-menu-after">
-        <div id="top-bar">
-            <span id="title-top">The Maze V</span>
-        </div>
-        <div id="menu-buttons">
-            <button class="menu-btn" id="playBtn">Play</button>
-            <button class="menu-btn" id="settingsBtn">Settings</button>
-            <button class="menu-btn" id="creditsBtn">Credits</button>
-            <button class="menu-btn" id="exitBtn">Exit</button>
-        </div>
-        <div id="bottom-left">By 44devs</div>
-        <div id="logs-btn">Logs</div>
-    </div>
-
-    <div id="selection-overlay">
-        <div class="sel-title">Selection</div>
-        <button class="sel-btn sel-exit" id="selExit">← Exit</button>
-        <button class="sel-btn sel-play" id="selPlay">Play →</button>
-        <div class="sel-settings">
-            <div class="sel-setting-row">
-                <span class="label">Sanity Mode</span>
-                <div class="toggle-switch on" id="sanityToggle">
-                    <div class="toggle-knob"></div>
-                </div>
-                <span class="status on" id="sanityStatus">ON</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="credits-overlay">
-        <div id="credits-bg"></div>
-        <button id="credits-exit">← Exit</button>
-        <div id="credits-title">Credits</div>
-        <div id="credits-scroll">
-            <div id="credits-content">
-                <p style="font-size:clamp(2rem,5vw,3.5rem); margin-bottom:6vh;">~ Developers ~</p>
-                <p style="font-size:clamp(3.5rem,8vw,6rem); font-weight:700; letter-spacing:12px; color:#fff;">44devs</p>
-                <p style="margin-top:8vh; font-size:clamp(1.2rem,2.5vw,2rem); color:#aaa;">~ Artists ~</p>
-                <p style="font-size:clamp(2rem,4vw,3rem); color:#ddd; letter-spacing:4px;">Susanna Delelis</p>
-                <p style="margin-top:10vh; font-size:clamp(0.8rem,1.5vw,1.2rem); color:#666;">Thank you for playing</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="logs-overlay">
-        <div id="logs-box">
-            <div id="logs-header">
-                <span>Logs</span>
-                <button id="logs-exit">✕</button>
-            </div>
-            <div id="logs-content">
-                <p id="logs-version">0.0.1</p>
-                <p id="logs-date">Monday 7th September</p>
-               <p id="logs-version">0.0.2</p>
-                <p id="logs-date">Wensday 9th September</p>
-            </div>
-        </div>
-    </div>
-  
-    <div id="gameContainer" style="display:none; position:fixed; inset:0; z-index:9999; background:#000;">
-        <div id="threeContainer" style="width:100%; height:100%;"></div>
-        <div id="winOverlay">
-            <div class="winText">You Escaped.</div>
-            <div class="winSub" id="winContinue">Click to replay</div>
-        </div>
-        <div id="whiteFlash"></div>
-        <div id="blackFade"></div>
-        <div id="levelMsg"></div>
-        <div id="infoPanel"><div id="infoContent"></div></div>
-        <div id="timerContainer">5:0:0</div>
-        <div id="levelTitleContainer">
-            <div class="level-title-main" id="levelTitleMain">Level 1</div>
-            <div class="level-title-sub" id="levelTitleSub">The Woodland</div>
-        </div>
-        <div id="flashlightHint">click to toggle flashlight</div>
-        <div id="staminaContainer"><div id="staminaBar"></div></div>
-        <div id="sanityContainer">
-            <div id="sanityCircle">
-                <div id="sanityLetter">A</div>
-                <div id="sanityLabel">Sanity</div>
-            </div>
-        </div>
-        <div id="bodycamOverlay"><canvas id="bodycamCanvas"></canvas></div>
-        <div id="schizoOverlay"></div>
-        <div id="deathOverlay">
-            <div id="deathRedOverlay"></div>
-            <div id="deathWhiteFlash"></div>
-            <div id="deathContent">
-                <h1 id="deathTitle">You Have Died.</h1>
-                <div class="death-sub" id="deathSub">Your time has run out.</div>
-                <div id="deathButtons">
-                    <button id="btnRespawn">Respawn</button>
-                    <button id="btnMainMenu">Main Menu</button>
-                    <button id="btnRestartLevels">Restart Levels</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
-      }
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
     }
-    </script>
-
-    <script src="menu.js"></script>
+  }
+  </script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
-
-
