@@ -138,6 +138,7 @@ export function startGame(sanityOn) {
   sanityEnabled = sanityOn;
   gameContainer.classList.add('active');
 
+  // Ensure container has size before initializing
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       initGame(sanityOn);
@@ -148,9 +149,11 @@ export function startGame(sanityOn) {
 function initGame(sanityOn) {
   const container = threeContainer;
 
+  // Force the container to have a valid size
   if (container.clientWidth === 0 || container.clientHeight === 0) {
     container.style.width = '100%';
     container.style.height = '100%';
+    // Force reflow
     void container.offsetWidth;
   }
 
@@ -168,6 +171,7 @@ function initGame(sanityOn) {
   cameraGroup.position.set(0, 1.55, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  // Set size immediately with current container dimensions
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
@@ -177,6 +181,7 @@ function initGame(sanityOn) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   container.appendChild(renderer.domElement);
 
+  // ---- Resize guard ----
   const resize = () => {
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -321,7 +326,10 @@ function initGame(sanityOn) {
   }
 
   // ---- Post-processing ----
+  // Create composer AFTER renderer has a size
   const composer = new EffectComposer(renderer);
+  // Ensure composer size matches renderer
+  composer.setSize(container.clientWidth, container.clientHeight);
   composer.addPass(new RenderPass(scene, camera));
 
   const realismShader = {
@@ -1642,7 +1650,6 @@ function initGame(sanityOn) {
   // ---- Misc game functions ----
   function getTerrainHeight(worldX, worldZ) { return 0; }
 
-  // ---- THIS IS THE MISSING FUNCTION ----
   function generateLevel(level) {
     if (mazeGroup) { scene.remove(mazeGroup); mazeGroup = null; }
     deactivateRedMode();
@@ -1941,6 +1948,12 @@ function initGame(sanityOn) {
     const dt = Math.min((time - prevTime) / 1000, 0.05);
     prevTime = time;
 
+    // ---- CRITICAL: skip rendering if container has zero size ----
+    if (container.clientWidth === 0 || container.clientHeight === 0) {
+      requestAnimationFrame(animate);
+      return;
+    }
+
     if (bodycamActive) {
       bodycamTime += dt * 1000;
       drawBodycam(bodycamTime);
@@ -2222,7 +2235,11 @@ function initGame(sanityOn) {
     }
 
     mouseSpeed *= 0.95;
-    composer.render();
+
+    // ---- Render only if composer and renderer are ready ----
+    if (composer && renderer) {
+      composer.render();
+    }
     requestAnimationFrame(animate);
   }
 
