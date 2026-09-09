@@ -1,4 +1,4 @@
-// ─── DOM REFS ──────────────────────────────────────────────
+
 const menu = document.getElementById('menu');
 const btnMobile = document.getElementById('btnMobile');
 const btnComputer = document.getElementById('btnComputer');
