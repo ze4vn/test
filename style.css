@@ -985,12 +985,13 @@ h1 {
 }
 
 #gameContainer {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: #000;
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #000;
 }
+
 #gameContainer.active {
-  display: block;
+    display: block;
 }
