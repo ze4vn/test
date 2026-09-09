@@ -441,7 +441,7 @@ function respawn() {
     isSchizo = false;
     schizoTimer = 0;
     isLocked = true;
-    try { renderer.domElement.requestPointerLock(); } catch (e) {}
+    // Request lock only when the user clicks – handled by click handler
 }
 
 function restartLevels() {
@@ -461,7 +461,6 @@ function restartLevels() {
     redOverlay.classList.remove('show');
     content.classList.remove('show');
     isLocked = true;
-    try { renderer.domElement.requestPointerLock(); } catch (e) {}
     updateTimerUI();
     document.getElementById('levelTitleContainer').classList.remove('visible');
 }
@@ -1697,6 +1696,7 @@ document.addEventListener('keyup', (e) => {
     if (key === 'P') pPressed = false;
 });
 
+// ─── CLICK HANDLER – pointer lock with .catch() ────────────
 renderer.domElement.addEventListener('click', () => {
     if (redModeActive) return;
     if (isLocked) {
@@ -1707,7 +1707,8 @@ renderer.domElement.addEventListener('click', () => {
         clearTimeout(window._hintTimeout);
         window._hintTimeout = setTimeout(() => hint.classList.remove('visible'), 1500);
     } else if (!isTransitioning && !isDead) {
-        try { renderer.domElement.requestPointerLock(); } catch (err) {}
+        // Request pointer lock and silently catch any rejection
+        renderer.domElement.requestPointerLock().catch(() => {});
     }
 });
 
@@ -1961,9 +1962,7 @@ if (isMobile) {
 function startGame() {
     // Use the global sanityOn (from URL)
     if (!sanityOn) {
-        // Sanity is disabled – we can bypass sanity drain
-        // (The game will handle it, but we keep the variable for logic)
-        // We'll still run the sanity functions but they'll be ignored.
+        // Sanity disabled – keep it at 100 (the game will skip drain)
     }
 
     // Delayed initialisation to let the container size settle
