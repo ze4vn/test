@@ -1851,11 +1851,7 @@ const sanityContainer = document.getElementById('sanityContainer');
 
 // ─── SAFE JOYSTICK & SANITY CONTAINER SETUP ──────────────
 if (joystickContainer) {
-    if (isMobile) {
-        joystickContainer.style.display = 'block';
-    } else {
-        joystickContainer.style.display = 'none';
-    }
+    joystickContainer.style.display = isMobile ? 'block' : 'none';
 }
 if (sanityContainer) {
     if (isMobile) {
