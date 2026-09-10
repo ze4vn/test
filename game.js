@@ -1164,12 +1164,9 @@ cameraGroup.add(camera);
 cameraGroup.position.set(0, 1.55, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-// ─── Mobile performance: lower pixel ratio, smaller shadows ──
+// ─── Mobile performance: lower pixel ratio ──
 if (isMobile) {
     renderer.setPixelRatio(1);
-    renderer.shadowMap.mapSize.width = 1024;
-    renderer.shadowMap.mapSize.height = 1024;
-    // Reduce bloom strength later
 } else {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
